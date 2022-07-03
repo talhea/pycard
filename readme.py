@@ -20,4 +20,5 @@
     2-2. dt_kicc_history_2022-07-01, 어제 날짜 기준, from kicc_history_excel.py
     2-3. dt_kicc_recipes_2022-07-01, 오늘 날짜 기준, from kicc_receips_excel.py
     2-4. dt_bank_2022-07-01, 오늘 날짜 기준, from bank_data.py
+    
 """
