@@ -1,3 +1,5 @@
+# 오페라 리포트 'trial balance'(어제 기준)를 내여받는다
+
 import pyautogui as gui
 import datetime
 import os, shutil
@@ -69,10 +71,12 @@ gui.moveTo(1005, 547)
 gui.click()
 gui.sleep(2)
 
-# 검색창 닫기, 파일이 저장될 시간 필요
+# 검색창 닫기
 # gui.hotkey('alt' + 'c')   # 이 때는 핫키가 안먹힘
 gui.moveTo(1090, 756)
 gui.click()
+
+# 파일이 저장될 시간 필요
 gui.sleep(15)
 
 # 오페라 종료
