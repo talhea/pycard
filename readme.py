@@ -22,3 +22,6 @@
     2-4. dt_bank_2022-07-01, 오늘 날짜 기준, from bank_data.py
     
 """
+
+# 2022.07.03 home, pm 04:29
+# bank_data.py 파이에서 'details' 관련 부부에서 'NH' 넣는 부분을 반드시 수정할것
