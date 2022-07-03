@@ -63,7 +63,7 @@ gui.moveTo(692, 546)
 gui.doubleClick()
 gui.sleep(1)
 
-target_file_name = "trial_balance" + target_date
+target_file_name = "trial_balance" + target_date     # trial_balance20220701
 gui.write(target_file_name, interval=0.4)
 gui.sleep(2)
 
@@ -91,9 +91,9 @@ gui.click()
 gui.sleep(3)
 
 # 자료를 다운로드 받는 down디렉토리 확인 (및 생성)
-down_base_dir = "./downdata/" + target_date
+down_base_dir = "./downdata/" + target_date     # 어제날짜로 된 폴더 ./downdata/20220701/
 try:
-    if os.path.exists(down_base_dir) == False:
+    if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
         os.makedirs(down_base_dir)
 except:
     with open("./error.log", "a") as file:
@@ -104,5 +104,5 @@ except:
 
 # 파일 옮기기 : downdata디렉토리로
 # 디렉토리의 파일만 검색해서 .. 파일 이름에서 유추... 해당 파일을 복사/이동
-target_file_name = "C:/users/fa2/" + target_file_name + ".xml"
-shutil.move(target_file_name, down_base_dir)
+target_file_name = "C:/users/fa2/" + target_file_name + ".xml"      # 파일 위치 : c:/users/fa2/trial_balance20220701.xml
+shutil.move(target_file_name, down_base_dir)                        # ./downdata/20220701/ 폴더로 이동
