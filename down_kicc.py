@@ -104,7 +104,7 @@ gui.click()
 gui.sleep(2)
 
 # 자료를 다운로드 받는 down디렉토리 확인 (및 생성)
-target_file_names = ['입금현황 · 일별.xlsx', '신용거래내역조회.xlsx']   # 이동시킬 파일 이름 리스트
+target_file_names = ['입금현황 · 일별.xlsx', '신용거래내역조회.xlsx']   # 입금파일: 오늘날짜, 신용거래내역: 어제날짜
 down_base_dir = "./downdata/" + target_date                         # 어제날짜로 된 폴더 ./downdata/20220701/
 try:
     if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
