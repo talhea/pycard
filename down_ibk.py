@@ -18,11 +18,24 @@ gui.click()
 # 크롬 창 첫번쨰 탭,  기업은행 선택
 gui.moveTo(130, 17)
 gui.click()
+gui.sleep(1)
 
-# 본문 내 로그인 버튼 클릭
-gui.moveTo(713, 499)
-gui.click()
-gui.sleep(2)
+# 로그인 버튼 찾기
+try:
+    # 본문 내 다시로그인 버튼
+    # gui.moveTo(713, 499)
+    # gui.click()
+    gui.click(gui.locateCenterOnScreen('./img/ibk_relogin.PNG'))
+    gui.sleep(5)
+except:
+    # 상단 로그인 버튼 클릭
+    gui.moveTo(557, 112)
+    gui.click()
+    gui.sleep(2)
+    # 공인인증서 로그인 버튼
+    gui.moveTo(1068, 471)
+    gui.click()
+    gui.sleep(5)
 
 # 암호 입력창 입력
 gui.moveTo(688, 654)

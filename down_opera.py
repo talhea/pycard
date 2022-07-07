@@ -80,12 +80,12 @@ gui.click()
 gui.sleep(15)
 
 # 오페라 종료
-gui.moveTo(368, 175, duration=1)
+gui.moveTo(368, 175)
 gui.doubleClick()
 gui.sleep(8)
 
 # 최소화
-gui.moveTo(1224, 17, duration=1)
+gui.moveTo(1224, 17)
 gui.click()
 
 gui.sleep(3)
