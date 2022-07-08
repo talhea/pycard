@@ -5,9 +5,7 @@ import datetime
 import os, shutil
 
 # 어제날짜 추출
-target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime(
-    "%Y%m%d"
-)  # 어제날짜 이름
+target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제날짜 이름
 
 gui.PAUSE = 0.5
 gui.sleep(3)
