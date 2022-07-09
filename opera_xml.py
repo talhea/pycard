@@ -1,19 +1,26 @@
-# 오페라 trial report xml data
+"""
+다운로드 받은 오페라 trial balance를 dataframe과 엑셀로 각 각 저장
+"""   
 
 import pandas as pnds
 import xml.etree.ElementTree as et
-import pickle
+import pickle, os
 import datetime
 #from IPython.display import display
 
 def to_opera_df():
-    # 0. dataframe과 엑셀로 각 각 저장
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
-    down_base_dir = './downdata/' + target_date
+    """다운로드 받은 오페라 trial balance를 dataframe과 엑셀로 각 각 저장
+    xml로 된 오페라 trial balance 파일을 xml.etree.ElementTree 객체로 읽어들여 dataframe으로 만든다.
+    이 때의 원본은 따로 복사하여 추후에 엑셀 파일로 저장하고, 이후 필요한 컬름만 다시 추출하여 dataframe으로 저장한다
+    """    
+
 
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
-    xml_filename = down_base_dir + '/trial_balance' + target_date + '.xml'
-    xtree = et.parse(xml_filename)
+    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    down_base_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
+    xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
+    
+    xtree = et.parse(down_base_dir + xml_filename)                      # ElementTree 객체로 읽어들임
     xroot = xtree.getroot()
 
     # 2. trial balance 내용인 node(G_TRX_CODE tag : ) 추출
@@ -58,24 +65,58 @@ def to_opera_df():
     # 5-1. 오페라 신용카드 transaction code 추출 : 실행파일 opera_card_trx_code.py(ipynb)에서 생성
     card_df = pnds.read_csv('./trx_card_codes.csv', sep='\t')               # {'TRX_CODE': 'Description'} 형식
     card_df['TRX_CODE'] = card_df['TRX_CODE'].astype('str', errors='ignore')# trx_code를 str 타입으로 변경
+
     card_df.set_index(keys=['TRX_CODE'], inplace=True)                      # transaction code를 index로 변경
 
-    # 5-2. 추출된 transaction code에 해당되는 것들만 추출
+    # 5-2. 신용카드 transaction code에 해당되는 것들만 추출
     opera_df = opera_df.loc[opera_df['TRX_CODE'].isin(card_df.index)][['TRX_CODE','DESCRIPTION', 'TB_AMOUNT', 'NON_REVENUE_AMT', 'TRX_DATE']]
     opera_df.set_index('TRX_CODE', drop=True, inplace=True)
 
     # 6. dataframe과 엑셀로 각 각 저장
-    dt_base_dir = './dtdata/' + target_date
+    dt_base_dir = './dtdata/' + target_date + '/'       # 저장폴더 './dtdata/YYYYMMDD/'
 
-    # 6-1. dataframe 저장
-    df_filename = '/dt_opera_trial_' + target_date
-    with open(dt_base_dir + df_filename, "wb") as file:
-        pickle.dump(opera_df, file)
+    # 6-1. 목적지 dt디렉토리 확인하고 없으면 생성
+    try:
+        if os.path.exists(dt_base_dir) == False:        # 폴더가 없으면 생성
+            os.makedirs(dt_base_dir)
+    except Exception as e:
+        with open('./error.log', 'a') as file:          # error 로그 파일에 추가
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+            )
 
-    # 6-2. excel 저장
-    xl_filename = '/opera_trial_' + target_date + '.xlsx'
-    with pnds.ExcelWriter(dt_base_dir + xl_filename) as writer:
-        origin_df.to_excel(writer, sheet_name='original', index=False)
+    # 6-2. dataframe 저장
+    try:
+        df_filename = 'dt_opera_trial_' + target_date           # 저장파일 'dt_opera_trial_YYYYMMDD
+        with open(dt_base_dir + df_filename, "wb") as file:
+            pickle.dump(opera_df, file)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
+            )
+
+    # 6-3. excel 저장
+    try:
+        xl_filename = 'opera_trial_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
+        
+        with pnds.ExcelWriter(dt_base_dir + xl_filename) as writer:
+            origin_df.to_excel(writer, sheet_name='original', index=False)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {xl_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {xl_filename} : {e}'
+            )
+
 
 if __name__ == '__main__':
     to_opera_df()

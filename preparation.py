@@ -3,8 +3,6 @@
 import os
 import datetime
 
-from nbformat import read
-
 def ready():
     # 1. 디렉토리 생성 : 어제날짜로 된 이름들
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
