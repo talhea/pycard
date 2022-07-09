@@ -32,9 +32,9 @@ def to_card_history_df():
     card_history_df.dropna(subset=['거래고유번호'], inplace=True)           # '거래고유번호'가 NaN 값이면 빈칸이거나 잘못된 라인
 
     # 2-3. '승인번호' 중복 라인제거 == 당일 취소 건 제거
-    card_history_df.drop_duplicates(subset='승인번호', keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
+    card_history_df.drop_duplicates(subset=['승인번호'], keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
 
-    # 2-4. 
+    # 2-4. 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
                                         '카드번호', '발급카드사', '매입카드사', '금액']]
 
