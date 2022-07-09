@@ -17,15 +17,19 @@ def to_card_history_df():
     down_base_dir = './downdata/' + target_date + '/'                                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     card_filename = down_base_dir + '신용거래내역조회.xlsx'                             # KICC 카드 거래내역 엑셀파일
 
-    card_history_df = pnds.read_excel(card_filename, header=0, thousands = ',',         # 금액 천단위 구분자 ',' 고려
-                                    dtype={'거래고유번호': str, '금액': 'int64'})       # 필요 컬럼의 데이터 타입 고정
+    card_history_df = pnds.read_excel(
+                                    card_filename, header=0, thousands = ',',           # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
+                                    dtype={'거래고유번호': str,                         # 너무 큰 숫자들이므로 문자열로 셋팅
+                                            '금액': 'int64',
+                                            '승인번호': str}                            # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
+                                    )
     
     # 2. 데이터 전처리
     # 2-1. '거래일시' 컬럼명 수정
     card_history_df.rename(columns={'거래일시▼': 'date'}, inplace=True)     # '거래일시' 컬럼명 'date'로 수정 => 다른 dataframe과 통일
 
     # 2-2. '거래고유번호' 컬럼에 있는 내용중에 NaN인 행 제거
-    card_history_df = card_history_df.dropna(subset=['거래고유번호'])       # '거래고유번호'가 NaN 값이면 빈칸이거나 잘못된 라인
+    card_history_df.dropna(subset=['거래고유번호'], inplace=True)           # '거래고유번호'가 NaN 값이면 빈칸이거나 잘못된 라인
 
     # 2-3. '승인번호' 중복 라인제거 == 당일 취소 건 제거
     card_history_df.drop_duplicates(subset='승인번호', keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
@@ -35,10 +39,10 @@ def to_card_history_df():
                                         '카드번호', '발급카드사', '매입카드사', '금액']]
 
     # 2-5. date 기준 sorting
-    card_history_df = card_history_df.sort_values(by=['date'])
-
+    card_history_df.sort_values(by=['date'], inplace=True)
+    
     # 2-6. date 정렬이후 포맷 변경: '%Y-%m-%d'
-    card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore') # 날짜 포맷 : '%Y-%m-%d'
+    card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. dt디렉토리에 dataframe 저장
     dt_base_dir = './dtdata/' + target_date + '/'       # 데이타를 저장할 dt디렉토리 './dtdata/YYYYMMDD/'
