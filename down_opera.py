@@ -3,6 +3,7 @@
 import pyautogui as gui
 import datetime
 import os, shutil
+import move_to_down as todown
 
 def down():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
@@ -87,21 +88,24 @@ def down():
 
     gui.sleep(3)
 
-    # 자료를 다운로드 받는 down디렉토리 확인 (및 생성)
-    down_base_dir = "./downdata/" + target_date     # 어제날짜로 된 폴더 ./downdata/20220701/
-    try:
-        if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
-            os.makedirs(down_base_dir)
-    except:
-        with open("./error.log", "a") as file:
-            file.write(
-                f"[down_opera.py] : {datetime.datetime.now()} - Exception: Cannot create the directory {down_base_dir}"
-            )
-            print("Error: Cannot create the directory {}".format(down_base_dir))
+    # 다운로드 받는 파일을 down디렉토리로 이동
+    down_base_dir = "./downdata/" + target_date         # 어제날짜로 된 폴더 ./downdata/YYYYMMDD/
+    target_file_name += ".xml"                          # 파일 trial_balanceYYYYMMDD.xml
 
-    # 파일 옮기기 : downdata디렉토리로
-    target_file_name = "C:/users/fa2/" + target_file_name + ".xml"      # 파일 위치 : c:/users/fa2/trial_balance20220701.xml
-    shutil.move(target_file_name, down_base_dir)                        # ./downdata/20220701/ 폴더로 이동
+    todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
+    # try:
+    #     if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
+    #         os.makedirs(down_base_dir)
+    # except:
+    #     with open("./error.log", "a") as file:
+    #         file.write(
+    #             f"[down_opera.py] : {datetime.datetime.now()} - Exception: Cannot create the directory {down_base_dir}"
+    #         )
+    #         print("Error: Cannot create the directory {}".format(down_base_dir))
+
+    # # 파일 옮기기 : downdata디렉토리로
+    # target_file_name = "C:/users/fa2/" + target_file_name + ".xml"      # 파일 위치 : c:/users/fa2/trial_balance20220701.xml
+    # shutil.move(target_file_name, down_base_dir)                        # ./downdata/20220701/ 폴더로 이동
 
 if __name__ == '__main__':
     down()
