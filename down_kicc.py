@@ -4,7 +4,7 @@
 import pyautogui as gui
 import datetime
 import os, shutil
-import move_to_down as todown
+import moving_to_folder as todown
 
 def down():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷

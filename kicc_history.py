@@ -11,7 +11,6 @@ def to_card_history_df():
     xlsx 파일을 read_excel함수로 읽어들여 dataframe으로 만들고, 중복된 승인번호(당일 취소) 제거하고 날짜 포맷 셋팅 후 dataframe 으로 저장
     """    
 
-
     # 1. 엑셀 파일을 읽어서 DataFrame 생성
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     down_base_dir = './downdata/' + target_date + '/'                                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'

@@ -3,7 +3,7 @@
 import pyautogui as gui
 import datetime
 import os, shutil
-import move_to_down as todown
+import moving_to_folder as todown
 
 def down():
     receips_date = datetime.datetime.now().strftime("%Y%m%d")                           # 오늘 입금 내역
