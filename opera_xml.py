@@ -14,14 +14,12 @@ def to_opera_df():
     이 때의 원본은 따로 복사하여 추후에 엑셀 파일로 저장하고, 이후 필요한 컬름만 다시 추출하여 dataframe으로 저장한다
     """    
 
-
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     down_base_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     
     xtree = et.parse(down_base_dir + xml_filename)                      # ElementTree 객체로 읽어들임
-    xroot = xtree.getroot()
 
     # 2. trial balance 내용인 node(G_TRX_CODE tag : ) 추출
     g_trx_codes = xtree.findall('LIST_G_TRX_TYPE/G_TRX_TYPE/LIST_G_TRX_CODE/G_TRX_CODE')
@@ -40,25 +38,24 @@ def to_opera_df():
             key = item.tag.strip()      # column용 딕셔너리 key
             if key in df_cols:          # key가 dataframe용 column 일 경우만
                 value = item.text       # column용 딕셔너리 value
-                # if value is None:         # value 전처리, None이면 0...
-                #     value = 0             # None: 해당없음 의미.. 따라서 값 유지
-
                 cols.update({key: value})   # column용 딕셔너리 추가
 
-        rows.append(cols)           # 완성된 index 한 줄을 리스트에 추가
+        rows.append(cols)           # 완성된 index 한 줄(딕셔너리)을 리스트에 추가
 
 
     # 3-3. 추출된 rows 리스트와 df_cols 리스트를 이용해서 DataFrame 생성하고 원본 복사(추후에 엑셀 sheet에 저장)
     opera_df = pnds.DataFrame(rows, columns=df_cols)
+    opera_df.dropna(subset=['TRX_CODE'], inplace=True)      # 'TRX_CODE' 컬럼 값이 NaN인 행 제거
+    
     origin_df = opera_df.copy()
 
     # 4. 데이터 전처리 : 자료형 변환
     opera_df['TRX_DATE'] = opera_df['TRX_DATE'].astype('datetime64[ns]', errors='ignore')   # date 포맷 변경을 위해서 datetimee 타입으로 변환
     opera_df['TRX_DATE'] = opera_df['TRX_DATE'].dt.strftime('%Y-%m-%d')                     # 연산을 통해 포맷 변경 => 반환 타입은 일반 객체로 변경됨
 
-    for col in df_cols:
+    for col in df_cols:                                                     # dataframe에 컬럼명으로 사용된 리스트 looping
         if col not in ['DESCRIPTION', 'TRX_DATE', 'TRX_CODE']:              # description과 date, trx_code 컬럼만 제외하고 모두 int형으로 변환  
-            opera_df[col] = opera_df[col].astype('int', errors='ignore')    # 에러 발생 값들은 무시, 따라서 아래와 같은...
+            opera_df[col] = opera_df[col].astype('int64', errors='ignore')  # 에러 발생 값들은 무시, 따라서 아래와 같은...
                                                                             # 일부 컬럼들 int로 변환 실패는, None 타입에의한 에러 발생으로 추측
 
     # 5. 실제 필요한 dataframe 추출
