@@ -14,14 +14,24 @@ def to_receipts_history_df():
     # 1. 입금현황 엑셀 파일을 읽어서 DataFrame 생성
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     down_base_dir = './downdata/' + target_date + '/'                                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
-    receipts_filename = down_base_dir + '입금현황 · 일별.xlsx'                         # KICC 입금현황 엑셀파일
-
-    receipts_history_df = pnds.read_excel(receipts_filename, header=0, thousands = ',', # 금액 천단위 구분자 ',' 고려
-                                    dtype={'가맹점번호': str, '접수건수': 'int32',      # 필요 컬럼의 데이터 타입 고정
-                                            '접수금액': 'int64', '합계건수': 'int32',
-                                            '합계금액': 'int64', '미입금건수': 'int32',
-                                            '미입금액': 'int64', '수수료': 'int64',
-                                            '입금예정액': 'int64'})
+    receipts_filename = down_base_dir + '입금현황 · 일별.xlsx'                          # KICC 입금현황 엑셀파일
+    
+    try:
+        receipts_history_df = pnds.read_excel(receipts_filename, header=0, thousands = ',', # 금액 천단위 구분자 ',' 고려
+                                        dtype={'가맹점번호': str, '접수건수': 'int32',      # 필요 컬럼의 데이터 타입 고정
+                                                '접수금액': 'int64', '합계건수': 'int32',
+                                                '합계금액': 'int64', '미입금건수': 'int32',
+                                                '미입금액': 'int64', '수수료': 'int64',
+                                                '입금예정액': 'int64'})
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}'
+            )
+        raise(e)
 
     # 2. '입금예정일자' 컬럼명 수정 : 다른 dataframe과 통일
     receipts_history_df.rename(columns={'입금예정일자': 'date'}, inplace=True)     # '입금예정일자' 컬럼명 'date'로 수정
@@ -44,6 +54,7 @@ def to_receipts_history_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
             )
+        raise(e)
 
     # 4-2. dataframe 저장
     try:
@@ -59,6 +70,7 @@ def to_receipts_history_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
             )
+        raise(e)
 
 
 if __name__ == '__main__':

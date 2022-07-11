@@ -15,13 +15,23 @@ def to_card_history_df():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     down_base_dir = './downdata/' + target_date + '/'                                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     card_filename = down_base_dir + '신용거래내역조회.xlsx'                             # KICC 카드 거래내역 엑셀파일
-
-    card_history_df = pnds.read_excel(
-                                    card_filename, header=0, thousands = ',',           # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
-                                    dtype={'거래고유번호': str,                         # 너무 큰 숫자들이므로 문자열로 셋팅
-                                            '금액': 'int64',
-                                            '승인번호': str}                            # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
-                                    )
+    
+    try:
+        card_history_df = pnds.read_excel(
+                                        card_filename, header=0, thousands = ',',           # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
+                                        dtype={'거래고유번호': str,                         # 너무 큰 숫자들이므로 문자열로 셋팅
+                                                '금액': 'int64',
+                                                '승인번호': str}                            # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
+                                        )
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {card_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {card_filename} : {e}'
+            )
+        raise(e)
     
     # 2. 데이터 전처리
     # 2-1. '거래일시' 컬럼명 수정
@@ -58,6 +68,7 @@ def to_card_history_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
             )
+        raise(e)
     
     # 3-2. dataframe 저장
     try:
@@ -73,6 +84,7 @@ def to_card_history_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
             )
+        raise(e)
 
 
 if __name__ == '__main__':

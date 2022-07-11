@@ -1,24 +1,45 @@
 import pandas as pnds
 import openpyxl
 import datetime
-import pickle
+import pickle, os
 
 def merge_edi_opera():
     # 1. EDI 템플릿 엑셀 파일을 읽어서 DataFrame 생성
-    excel_filename = './EDI-xx월.xlsx'                                  # EDI 엑셀 템플릿 파일
-    edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
-    ws = edi_excel.active                                               # 활성화된 sheet
+    excel_filename = './EDI-xx월.xlsx'                                      # EDI 엑셀 템플릿 파일
+    
+    try:
+        edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
+        ws = edi_excel.active                                               # 활성화된 sheet
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}'
+            )
+        raise(e)
 
     # 2. 오페라 어제 마감된 trial report(dt_trial_balance_날짜) dataframe 읽기
     yesterday = datetime.datetime.now() - datetime.timedelta(1) # 어제 날짜 추출
-    target_date = yesterday.strftime("%Y%m%d")      # 어제 날짜 추출
+    target_date = yesterday.strftime("%Y%m%d")                  # 어제 날짜 포맷
     
     dt_base_dir = './dtdata/' + target_date + '/'
     df_filename = 'dt_opera_trial_' + target_date
-
-    with open(dt_base_dir + df_filename, "rb") as file:
-        opera_df = pickle.load(file)
-
+    
+    try:
+        with open(dt_base_dir + df_filename, "rb") as file:
+            opera_df = pickle.load(file)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dt_base_dir + df_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dt_base_dir + df_filename} : {e}'
+            )
+        raise(e)
+    
     # 3. 오페라 dataframe의 trx_code와 EDI 엑셀 좌표 매칭 정보
     map_code_edi = {
         # TRX_CODE : 엑셀좌표
@@ -50,8 +71,18 @@ def merge_edi_opera():
     ws.title = str(yesterday.day)               # sheet 이름 변경
 
     # 5. 파일 저장
-    excel_filename = dt_base_dir + '/EDI-' + target_date + '.xlsx'              # 파일 저장 시에 필요한 당 월의 엑셀파일 이름
-    edi_excel.save(excel_filename)
+    try:
+        excel_filename = dt_base_dir + '/EDI-' + target_date + '.xlsx'              # 파일 저장 시에 필요한 당 월의 엑셀파일 이름
+        edi_excel.save(excel_filename)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}'
+            )
+        raise(e)
 
 
 if __name__ == '__main__':

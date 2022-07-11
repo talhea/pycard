@@ -21,6 +21,7 @@ def to_downdata(target_dir: str, target_file: str) -> None:
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}'
             )
+        raise(e)
 
     # 파일 옮기기 : 'downdata/날짜' 디렉토리로
     target_file = 'C:/users/fa2/downloads/' + target_file       # 파일 위치 : c:/users/fa2/{target_file}
@@ -35,6 +36,7 @@ def to_downdata(target_dir: str, target_file: str) -> None:
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}'
             )
+        raise(e)
 
 
 if __name__ == '__main__':

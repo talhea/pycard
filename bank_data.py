@@ -20,8 +20,18 @@ def to_bank_df():
     ibk_filename = down_base_dir + '거래내역조회_입출식 예금' + target_date             # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
-    with open(down_base_dir + ibk_filename, 'r', encoding='euc-kr') as file:
-        lines = file.readlines()
+    try:
+        with open(down_base_dir + ibk_filename, 'r', encoding='euc-kr') as file:
+            lines = file.readlines()
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + ibk_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + ibk_filename} : {e}'
+            )
+        raise(e)
     
     # 1-2. 리스트의 각 라인을 '|' 기준으로 분리한 후, dataframe을 만든다
     lines = list(map(lambda line: line.strip().split('|'), lines))      # '\n' 제거하고 '|' 단위로 분해
@@ -62,9 +72,19 @@ def to_bank_df():
 
     # 4. 농협의 xml 파일은 실제 내용은 html, 따라서 BeautifulSoup를 이용해서 읽어들임
     nh_filename = down_base_dir + target_date + '.xls'          # 읽을 파일 이름 'YYYYMMDD.xls'
-
-    with open(nh_filename, 'rt') as page:
-        soup = BeautifulSoup(page, 'html.parser')
+    
+    try:
+        with open(nh_filename, 'rt') as page:
+            soup = BeautifulSoup(page, 'html.parser')
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + nh_filename} : {e}'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + nh_filename} : {e}'
+            )
+        raise(e)
 
     # 5. dataframe 생성
     # 5-1. 내용 추출
@@ -126,6 +146,7 @@ def to_bank_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
             )
+        raise(e)
     
     # 10-2. dataframe 저장
     try:
@@ -141,6 +162,7 @@ def to_bank_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
             )
+        raise(e)
 
 
 if __name__ == '__main__':
