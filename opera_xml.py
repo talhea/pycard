@@ -16,18 +16,18 @@ def to_opera_df():
 
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
-    down_base_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
+    dowmdata_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     
     try:
-        xtree = et.parse(down_base_dir + xml_filename)                  # ElementTree 객체로 읽어들임
+        xtree = et.parse(dowmdata_dir + xml_filename)                  # ElementTree 객체로 읽어들임
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {down_base_dir + xml_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {dowmdata_dir + xml_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {down_base_dir + xml_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {dowmdata_dir + xml_filename} : {e}\n'
             )
         raise(e)
 
@@ -80,34 +80,34 @@ def to_opera_df():
     opera_df.set_index('TRX_CODE', drop=True, inplace=True)
 
     # 6. dataframe과 엑셀로 각 각 저장
-    dt_base_dir = './dtdata/' + target_date + '/'       # 저장폴더 './dtdata/YYYYMMDD/'
+    dfdata_dir = './dfdata/' + target_date + '/'       # 저장폴더 './dfdata/YYYYMMDD/'
 
-    # 6-1. 목적지 dt디렉토리 확인하고 없으면 생성
+    # 6-1. 목적지 df디렉토리 확인하고 없으면 생성
     try:
-        if os.path.exists(dt_base_dir) == False:        # 폴더가 없으면 생성
-            os.makedirs(dt_base_dir)
+        if os.path.exists(dfdata_dir) == False:        # 폴더가 없으면 생성
+            os.makedirs(dfdata_dir)
     except Exception as e:
         with open('./error.log', 'a') as file:          # error 로그 파일에 추가
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
             )
         raise(e)
 
     # 6-2. dataframe 저장
     try:
-        df_filename = 'dt_opera_trial_' + target_date           # 저장파일 'dt_opera_trial_YYYYMMDD
-        with open(dt_base_dir + df_filename, "wb") as file:
+        df_filename = 'df_opera_trial_' + target_date           # 저장파일 'df_opera_trial_YYYYMMDD
+        with open(dfdata_dir + df_filename, "wb") as file:
             pickle.dump(opera_df, file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dt_base_dir + df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dfdata_dir + df_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dt_base_dir + df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dfdata_dir + df_filename} : {e}\n'
             )
         raise(e)
 
@@ -115,15 +115,15 @@ def to_opera_df():
     try:
         xl_filename = 'opera_trial_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
-        with pnds.ExcelWriter(dt_base_dir + xl_filename) as writer:
+        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
             origin_df.to_excel(writer, sheet_name='original', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dt_base_dir + xl_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dt_base_dir + xl_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
             )
         raise(e)
 

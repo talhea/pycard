@@ -100,8 +100,8 @@ def down():
 
 
     # 다운로드 받는 파일을 down디렉토리로 이동
+    down_base_dir = 'C:/Users/FA2/Downloads/'           # 파일이 다운로드된 디렉토리
     target_file_name = receips_date + '.xls'            # 오늘 날짜로 된 입금내역 YYYYMMDD.xls
-    down_base_dir = "./downdata/" + target_date         # 어제날짜로 된 폴더 ./downdata/YYYYMMDD/
 
     todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
 

@@ -1,9 +1,14 @@
+'''EDI 템플릿 엑셀 파일에 오페라 balance trial dataframe을 입력한다
+
+'''
 import pandas as pnds
 import openpyxl
 import datetime
 import pickle, os
 
 def merge_edi_opera():
+    """EDI 템플릿 엑셀 파일에 오페라 balance trial dataframe을 입력한다
+    """    
     # 1. EDI 템플릿 엑셀 파일을 읽어서 DataFrame 생성
     excel_filename = './EDI-xx월.xlsx'                                      # EDI 엑셀 템플릿 파일
     
@@ -13,30 +18,30 @@ def merge_edi_opera():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}\n'
             )
         raise(e)
 
-    # 2. 오페라 어제 마감된 trial report(dt_trial_balance_날짜) dataframe 읽기
+    # 2. 오페라 어제 마감된 trial report(df_trial_balance_날짜) dataframe 읽기
     yesterday = datetime.datetime.now() - datetime.timedelta(1) # 어제 날짜 추출
     target_date = yesterday.strftime("%Y%m%d")                  # 어제 날짜 포맷
     
-    dt_base_dir = './dtdata/' + target_date + '/'
-    df_filename = 'dt_opera_trial_' + target_date
+    dfdata_dir = './dfdata/' + target_date + '/'
+    df_filename = 'df_opera_trial_' + target_date
     
     try:
-        with open(dt_base_dir + df_filename, "rb") as file:
+        with open(dfdata_dir + df_filename, "rb") as file:
             opera_df = pickle.load(file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dt_base_dir + df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + df_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dt_base_dir + df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + df_filename} : {e}\n'
             )
         raise(e)
     
@@ -72,15 +77,15 @@ def merge_edi_opera():
 
     # 5. 파일 저장
     try:
-        excel_filename = dt_base_dir + '/EDI-' + target_date + '.xlsx'              # 파일 저장 시에 필요한 당 월의 엑셀파일 이름
+        excel_filename = dfdata_dir + 'EDI-' + target_date + '.xlsx'              # 파일 저장 시에 필요한 당 월의 엑셀파일 이름
         edi_excel.save(excel_filename)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}\n'
             )
         raise(e)
 

@@ -16,20 +16,20 @@ def to_bank_df():
     """    
     # 1. 기업은행에서 '텍스트형식저장'한 내역을 읽고 dataframe을 만든다
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
-    down_base_dir = './downdata/' + target_date + '/'                                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
-    ibk_filename = down_base_dir + '거래내역조회_입출식 예금' + target_date             # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
+    downdata_dir = './downdata/' + target_date + '/'                                    # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
+    ibk_filename = downdata_dir + '거래내역조회_입출식 예금' + target_date                  # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
     try:
-        with open(down_base_dir + ibk_filename, 'r', encoding='euc-kr') as file:
+        with open(downdata_dir + ibk_filename, 'r', encoding='euc-kr') as file:
             lines = file.readlines()
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + ibk_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + ibk_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + ibk_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + ibk_filename} : {e}\n'
             )
         raise(e)
     
@@ -71,7 +71,7 @@ def to_bank_df():
     #------------------------------------------------------------------------------------------------------------------
 
     # 4. 농협의 xml 파일은 실제 내용은 html, 따라서 BeautifulSoup를 이용해서 읽어들임
-    nh_filename = down_base_dir + target_date + '.xls'          # 읽을 파일 이름 'YYYYMMDD.xls'
+    nh_filename = downdata_dir + target_date + '.xls'          # 읽을 파일 이름 'YYYYMMDD.xls'
     
     try:
         with open(nh_filename, 'rt') as page:
@@ -79,10 +79,10 @@ def to_bank_df():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + nh_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {down_base_dir + nh_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}\n'
             )
         raise(e)
 
@@ -131,36 +131,36 @@ def to_bank_df():
     # 날짜 포맷 : '%Y-%m-%d'
     bank_df['date'] = bank_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore') # 날짜 포맷 : '%Y-%m-%d'
     
-    # 10. dt디렉토리에 dataframe 저장
-    dt_base_dir = './dtdata/' + target_date + '/'       # 데이타를 저장할 dt디렉토리 './dtdata/YYYYMMDD/'
+    # 10. df디렉토리에 dataframe 저장
+    dfdata_dir = './dfdata/' + target_date + '/'       # 데이타를 저장할 df디렉토리 './dfdata/YYYYMMDD/'
     
-    # 10-1. 목적지 dt디렉토리 확인하고 없으면 생성
+    # 10-1. 목적지 df디렉토리 확인하고 없으면 생성
     try:
-        if os.path.exists(dt_base_dir) == False:        # 폴더가 없으면 생성
-            os.makedirs(dt_base_dir)
+        if os.path.exists(dfdata_dir) == False:        # 폴더가 없으면 생성
+            os.makedirs(dfdata_dir)
     except Exception as e:
         with open('./error.log', 'a') as file:          # error 로그 파일에 추가
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dt_base_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
             )
         raise(e)
     
     # 10-2. dataframe 저장
     try:
-        df_filename = 'dt_bank_' + target_date      # 저장할 dataframe 파일 이름 'dt_bank_YYYYMMDD'
+        df_filename = 'df_bank_' + target_date      # 저장할 dataframe 파일 이름 'df_bank_YYYYMMDD'
 
-        with open(dt_base_dir + df_filename, "wb") as file:
+        with open(dfdata_dir + df_filename, "wb") as file:
             pickle.dump(bank_df, file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
             )
         raise(e)
 
