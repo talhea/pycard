@@ -112,21 +112,7 @@ def down():
 
     target_file_name = '신용거래내역조회.xlsx'              # 신용거래내역: 어제날짜
     todown.to_downdata(down_base_dir, target_file_name)     # 파일 이동
-    # try:
-    #     if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
-    #         os.makedirs(down_base_dir)
-    # except:
-    #     with open("./error.log", "a") as file:
-    #         file.write(
-    #             f"[down_opera.py] : {datetime.datetime.now()} - Exception: Cannot create the directory {down_base_dir}"
-    #         )
-    #         print("Error: Cannot create the directory {}".format(down_base_dir))
 
-    # # 파일 옮기기 : downdata디렉토리로
-    # # 디렉토리의 파일만 검색해서 .. 파일 이름에서 유추... 해당 파일을 복사/이동
-    # for target_file_name in target_file_names:
-    #     target_file_name = "C:/users/fa2/downloads/" + target_file_name     # 파일 위치 : c:/users/fa2/trial_balance20220701.xml
-    #     shutil.move(target_file_name, down_base_dir)                        # ./downdata/20220701/ 폴더로 이동
 
 if __name__ == '__main__':
     down()

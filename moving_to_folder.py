@@ -30,10 +30,10 @@ def to_downdata(target_dir: str, target_file: str) -> None:
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}'
+                f'[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}'
             )
 
 

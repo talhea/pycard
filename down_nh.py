@@ -12,19 +12,19 @@ def down():
     gui.PAUSE = 0.5
     gui.sleep(3)
 
-    # 오페라 작업표시줄 위치 클릭 - 활성화시킴
+    # 크롬 작업표시줄 위치 클릭 - 활성화시킴
     gui.moveTo(650, 880)
     gui.click()
 
     # 크롬 창 세번쨰 탭,  민국은행 선택
     gui.moveTo(600, 17)
     gui.click()
-    gui.sleep(1)
+    gui.sleep(5)
     
     # 상단 로그인 버튼 클릭
     gui.moveTo(188, 98)
     gui.click()
-    gui.sleep(4)
+    gui.sleep(5)
 
     # 아이디/암호 입력창 입력
     gui.moveTo(875, 610)
@@ -104,20 +104,6 @@ def down():
     down_base_dir = "./downdata/" + target_date         # 어제날짜로 된 폴더 ./downdata/YYYYMMDD/
 
     todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
-    # try:
-    #     if os.path.exists(down_base_dir) == False:  # 폴더가 없으면 생성
-    #         os.makedirs(down_base_dir)
-    # except:
-    #     with open("./error.log", "a") as file:
-    #         file.write(
-    #             f"[down_opera.py] : {datetime.datetime.now()} - Exception: Cannot create the directory {down_base_dir}"
-    #         )
-    #         print("Error: Cannot create the directory {}".format(down_base_dir))
-
-    # # 파일 옮기기 : downdata디렉토리로
-    # # 디렉토리의 파일만 검색해서 .. 파일 이름에서 유추... 해당 파일을 복사/이동
-    # target_file_name = "C:/users/fa2/downloads/" + target_file_name     # 파일 위치 : c:/users/fa2/20220701.xml
-    # shutil.move(target_file_name, down_base_dir)                        # ./downdata/20220701/ 폴더로 이동
 
 
 if __name__ == '__main__':
