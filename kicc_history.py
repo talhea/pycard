@@ -85,6 +85,22 @@ def to_card_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
             )
         raise(e)
+    
+    # 3-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    try:
+        xl_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
+        
+        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
+            card_history_df.to_excel(writer, sheet_name='original', index=False)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
+            )
+            print(
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
+            )
+        raise(e)
 
 
 if __name__ == '__main__':
