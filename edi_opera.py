@@ -53,8 +53,8 @@ def merge_edi_opera():
         raise(e)
     
     # 3. 오페라 dataframe의 trx_code와 EDI 엑셀 book 컬럼 좌표 매칭 정보
-    map_code_book = {
-        # TRX_CODE : 엑셀좌표
+    mapping_code_book = {
+        # TRX_CODE : EDI BOOL컬럼 엑셀좌표
         '9231': 'B7',
         '9232': 'B9',
         '9233': 'B8',
@@ -72,9 +72,9 @@ def merge_edi_opera():
         '9245': 'B15'
     }
 
-    # 4. trial balance 내용을 순서대로 돌면서 엑셀에 입력(map_code_book 참조)
+    # 4. trial balance 내용을 순서대로 돌면서 엑셀에 입력(mapping_code_book 참조)
     for code in opera_df.index:     # trx-code를 이용해서 ws와 opera_df에 접근하는 looping
-        ws[map_code_book[code]] = opera_df.loc[code]['TB_AMOUNT'] * -1       # 오페라 dataframe으로부터 tb_amount 정보를 가져와, 
+        ws[mapping_code_book[code]] = opera_df.loc[code]['TB_AMOUNT'] * -1       # 오페라 dataframe으로부터 tb_amount 정보를 가져와, 
                                                                             # 맵핑 딕셔너리에서 추출한 좌표를 이용해서 ws(EDI엑셀)에 넣는다
     
     #------------------------------------------------------------------------------------------------------------------
@@ -166,8 +166,8 @@ def merge_edi_opera():
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9241'
     
-    # 7. 카드 분류에 따라 금액리스트에 금액 입력
-    # 카드 트랙잭션 코드별 금액 딕셔너리, 금액은 리스트 타입으로 엑셀 입력 서식이 적용됨
+    # 7. 카드분류에 따라 금액리스트에 금액 입력
+    # '카드 트랙잭션 코드별 금액' 딕셔너리, 금액은 리스트 타입 value에 추가되며 엑셀 입력 서식이 적용됨(예, '=+3000+2200+..')
     actual_cards_dict = {
         # {'transaction code': [금액,],}
         '9231': ['='],
@@ -186,9 +186,9 @@ def merge_edi_opera():
         '9245': ['=']
     }
     
-    # KICC 카드내역의 금액을 EDI 엑셀 Actual 컬럼 좌표와 연결하기위한 맵핑 정보
-    map_code_actual = {
-        # TRX_CODE : 엑셀좌표
+    # KICC 카드내역의 금액을 EDI 엑셀 Actual 컬럼 좌표와 연동하기위한 맵핑 정보
+    mapping_code_actual = {
+        # TRX_CODE : EDI Actual컬럼 엑셀좌표
         '9231': 'C7',
         '9232': 'C9',
         '9233': 'C8',
@@ -209,9 +209,9 @@ def merge_edi_opera():
     for index, row in card_history_df.iterrows():                       # dataframe row looping
         actual_cards_dict[row['카드분류']].append(f"+{row['금액']}")     # 해당 row의 금액을 str 타입으로 바꾸어서 코드별 리스트에 저장
     
-    # 코드별로 금액리스트를 엑셀 문자열 서식으로 edi 엑셀 파일에 저장(map_code_actual 참조)
-    for code, amounts in actual_cards_dict.items():         # trx-code를 이용해서 ws에 접근하는 looping
-        ws[map_code_actual[code]] = ''.join(amounts)        # 금액리스트(amounts)를 엑셀 입력 서식('=금액+금액...')으로 join
+    # 코드별로 금액리스트를 엑셀 문자열 서식으로 edi 엑셀 파일에 저장(mapping_code_actual 참조)
+    for code, amounts in actual_cards_dict.items():             # trx-code를 이용해서 ws에 접근하는 looping
+        ws[mapping_code_actual[code]] = ''.join(amounts)        # 금액리스트(amounts)를 엑셀 입력 서식('=+금액+금액...')으로 join
     
     # 8. sheet 이름 및 날짜 셋팅
     opera_date = yesterday.strftime('%b.%d.%Y')     # 오페라 포맷용 어제 날짜

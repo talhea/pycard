@@ -29,7 +29,7 @@ def to_receipts_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}'
             )
         raise(e)
 
@@ -52,7 +52,7 @@ def to_receipts_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dtdata_dir} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dtdata_dir} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dtdata_dir} : {e}'
             )
         raise(e)
 
@@ -68,7 +68,7 @@ def to_receipts_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
             )
         raise(e)
 
