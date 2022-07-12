@@ -6,6 +6,7 @@ import pandas as pnds
 import pickle, os
 import datetime
 
+
 def to_card_history_df():
     """다운로드 받은 KICC 신용카드 거래내역을 dataframe으로 저장한다
     xlsx 파일을 read_excel함수로 읽어들여 dataframe으로 만들고, 중복된 승인번호(당일 취소) 제거하고 날짜 포맷 셋팅 후 dataframe 으로 저장
@@ -13,6 +14,7 @@ def to_card_history_df():
 
     # 1. 엑셀 파일을 읽어서 DataFrame 생성
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    # target_date = '20220710'
     downdata_dir = './downdata/' + target_date + '/'                                    # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     card_filename = downdata_dir + '신용거래내역조회.xlsx'                             # KICC 카드 거래내역 엑셀파일
     
@@ -34,23 +36,31 @@ def to_card_history_df():
         raise(e)
     
     # 2. 데이터 전처리
-    # 2-1. '거래일시' 컬럼명 수정
+    # '거래일시' 컬럼명 수정
     card_history_df.rename(columns={'거래일시▼': 'date'}, inplace=True)     # '거래일시' 컬럼명 'date'로 수정 => 다른 dataframe과 통일
 
-    # 2-2. '거래고유번호' 컬럼에 있는 내용중에 NaN인 행 제거
+    # '거래고유번호' 컬럼에 있는 내용중에 NaN인 행 제거
     card_history_df.dropna(subset=['거래고유번호'], inplace=True)           # '거래고유번호'가 NaN 값이면 빈칸이거나 잘못된 라인
 
-    # 2-3. '승인번호' 중복 라인제거 == 당일 취소 건 제거
+    # '승인번호' 중복 라인제거 == 당일 취소 건 제거
     card_history_df.drop_duplicates(subset=['승인번호'], keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
 
-    # 2-4. 필요한 컬럼만 추출
+    # '승인구분'이 '승인' 라인 추출
+    card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
+
+    # target_date 날짜만 추출
+    date_str = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")  # 어제 날짜 포맷
+    card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
+
+    
+    # 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
                                         '카드번호', '발급카드사', '매입카드사', '금액']]
 
-    # 2-5. date 기준 sorting
+    # date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # 2-6. date 정렬이후 포맷 변경: '%Y-%m-%d'
+    # date 정렬이후 포맷 변경: '%Y-%m-%d'
     card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. df디렉토리에 dataframe 저장

@@ -16,6 +16,8 @@ def to_opera_df():
 
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    # 임시
+    target_date = '20220710'
     dowmdata_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     

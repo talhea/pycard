@@ -9,6 +9,4 @@ while True:
     
     pyautogui.moveTo(x, y, duration=2+)
     
-    pyautogui.write('ibis ambassador', interval=2)
-    
-    time.sleep(120)
+    time.sleep(300)

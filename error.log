@@ -1,1 +1,7 @@
 [__main__.py] <2022-07-11 15:06:32.606094> pickle file-reading error ./dfdata/20220710/df_kicc_history_20220710 : [Errno 2] No such file or directory: './dfdata/20220710/df_kicc_history_20220710'
+[__main__.py] <2022-07-12 08:25:21.665058> pickle file-reading error ./dfdata/20220711/df_kicc_history_20220710 : [Errno 2] No such file or directory: './dfdata/20220711/df_kicc_history_20220710'
+[__main__.py] <2022-07-12 08:27:40.417765> pickle file-reading error ./dfdata/20220711/df_kicc_history_20220710 : [Errno 2] No such file or directory: './dfdata/20220711/df_kicc_history_20220710'
+[__main__.py] <2022-07-12 08:27:44.069777> pickle file-reading error ./dfdata/20220711/df_kicc_history_20220710 : [Errno 2] No such file or directory: './dfdata/20220711/df_kicc_history_20220710'
+[__main__.py] <2022-07-12 12:59:01.109309> pickle file-reading error ./dfdata/20220711/df_opera_trial_20220711 : [Errno 2] No such file or directory: './dfdata/20220711/df_opera_trial_20220711'
+[__main__.py] <2022-07-12 12:59:56.130878> pickle file-reading error ./dfdata/20220711/df_opera_trial_20220710 : [Errno 2] No such file or directory: './dfdata/20220711/df_opera_trial_20220710'
+[__main__.py] <2022-07-12 13:00:12.492924> pickle file-reading error ./dfdata/20220711/df_opera_trial_20220710 : [Errno 2] No such file or directory: './dfdata/20220711/df_opera_trial_20220710'
