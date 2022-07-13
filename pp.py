@@ -1,6 +1,7 @@
 '''
 프로그램별로 실행한 결과를 바탕으로 실패한 프로그램 재실행
 '''
+from unittest import result
 import schedule, time
 import edi_opera, opera_xml
 import down_opera, down_kicc, down_ibk, down_nh
@@ -36,3 +37,6 @@ result_for_process = {
     # 'opera_xml': {'exec': opera_xml.to_opera_df, 'result': False},
 }
 
+print(result_for_process)
+result_for_process['preparation']['result'] = result_for_process['preparation']['exec']()
+print(result_for_process['preparation']['result'])

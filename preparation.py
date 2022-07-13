@@ -18,6 +18,7 @@ def ready():
         with open('./error.log', 'a') as file:
             file.write(f'{datetime.datetime.now()} - Exception: Cannot create the directory {downdata_dir}')
             print("Error: Cannot create the directory {}".format(downdata_dir))
+            return False
 
     # 1-2. python파일에서 생성하는 data를 저장하는 df디렉토리 생성
     dfdata_dir = './dfdata/' + target_date
@@ -28,7 +29,9 @@ def ready():
         with open('./error.log', 'a') as file:
             file.write(f'{datetime.datetime.now()} - Exception: Cannot create the directory {dfdata_dir}')
             print("Error: Cannot create the directory {}".format(dfdata_dir))
-
+            return False
+    
+    return True
     # 이후, KICC에서 자료 다운로드, 오페라에서 자료 다운로드, 기업은행에서 자료 다운로드
 
 if __name__ == '__main__':
