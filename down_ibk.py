@@ -43,8 +43,7 @@ def down():
     gui.click()
     gui.sleep(3)
 
-    gui.moveTo(281, 581)
-    gui.click()
+    gui.click(300, 581)
     gui.sleep(3)
 
     # 입금내역 클릭

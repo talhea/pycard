@@ -2,7 +2,7 @@
 
 import pyautogui as gui
 import datetime
-import os, shutil
+import pyperclip
 import moving_to_folder as todown
 
 def down():
@@ -29,7 +29,12 @@ def down():
     # 아이디/암호 입력창 입력
     gui.moveTo(875, 610)
     gui.click()
-    gui.write('ibis11', interval=0.4)    # 아이디 입력
+    gui.sleep(1)
+    # gui.write('ibis11', interval=0.4)    # 아이디 입력
+    gui.moveTo(986, 658)
+    gui.click()
+    gui.sleep(1)
+
     gui.click(1236, 658)                # 마우스 입력 선택
     gui.sleep(1)
     gui.click('./img/b.png')            # 암호 입력, 키보드 않먹힘

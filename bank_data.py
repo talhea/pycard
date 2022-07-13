@@ -16,8 +16,9 @@ def to_bank_df():
     """    
     # 1. 기업은행에서 '텍스트형식저장'한 내역을 읽고 dataframe을 만든다
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    receipts_date = datetime.datetime.now().strftime("%Y%m%d")                          # 입금 오늘 날짜
     downdata_dir = './downdata/' + target_date + '/'                                    # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
-    ibk_filename = downdata_dir + '거래내역조회_입출식 예금' + target_date                  # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
+    ibk_filename = '거래내역조회_입출식 예금' + receipts_date  + '.txt'                     # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
     try:
@@ -73,10 +74,10 @@ def to_bank_df():
     #------------------------------------------------------------------------------------------------------------------
 
     # 4. 농협의 xml 파일은 실제 내용은 html, 따라서 BeautifulSoup를 이용해서 읽어들임
-    nh_filename = downdata_dir + target_date + '.xls'          # 읽을 파일 이름 'YYYYMMDD.xls'
+    nh_filename = receipts_date + '.xls'                     # 읽을 파일 이름 'YYYYMMDD.xls'
     
     try:
-        with open(nh_filename, 'rt') as page:
+        with open(downdata_dir + nh_filename, 'rt', encoding='UTF-8') as page:
             soup = BeautifulSoup(page, 'html.parser')
     except Exception as e:
         with open('./error.log', 'a') as file:
@@ -84,7 +85,7 @@ def to_bank_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}'
             )
         raise(e)
 
@@ -152,7 +153,7 @@ def to_bank_df():
     
     # 10-2. dataframe 저장
     try:
-        df_filename = 'df_bank_' + target_date      # 저장할 dataframe 파일 이름 'df_bank_YYYYMMDD'
+        df_filename = 'df_bank_' + receipts_date      # 저장할 dataframe 파일 이름 'df_bank_YYYYMMDD'
 
         with open(dfdata_dir + df_filename, "wb") as file:
             pickle.dump(bank_df, file)

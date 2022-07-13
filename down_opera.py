@@ -16,7 +16,7 @@ def down():
     gui.click()
 
     # 이미 로그인 된 상태이므로 PMS 버튼 클릭: PMS 로그인 화면 로딩
-    gui.moveTo(738, 390)
+    gui.moveTo(750, 410)
     gui.click()
     gui.sleep(8)
 
@@ -83,7 +83,7 @@ def down():
     gui.sleep(8)
 
     # 최소화
-    gui.moveTo(1224, 17)
+    gui.moveTo(1486, 16)
     gui.click()
 
     gui.sleep(3)
