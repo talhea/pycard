@@ -16,7 +16,7 @@ def to_card_history_df():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     # target_date = '20220710'
     downdata_dir = './downdata/' + target_date + '/'                                    # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
-    card_filename = downdata_dir + '신용거래내역조회.xlsx'                             # KICC 카드 거래내역 엑셀파일
+    card_filename = downdata_dir + '신용거래내역조회.xlsx'                                  # KICC 카드 거래내역 엑셀파일
     
     try:
         card_history_df = pnds.read_excel(
@@ -31,9 +31,11 @@ def to_card_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {card_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {card_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {card_filename} : {e}'
             )
-        raise(e)
+        
+        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
+        return
     
     # 2. 데이터 전처리
     # '거래일시' 컬럼명 수정
@@ -51,7 +53,6 @@ def to_card_history_df():
     # target_date 날짜만 추출
     date_str = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")  # 어제 날짜 포맷
     card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
-
     
     # 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
@@ -60,13 +61,13 @@ def to_card_history_df():
     # date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # date 정렬이후 포맷 변경: '%Y-%m-%d'
+    # date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
     card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. df디렉토리에 dataframe 저장
     dfdata_dir = './dfdata/' + target_date + '/'       # 데이타를 저장할 df디렉토리 './dfdata/YYYYMMDD/'
     
-    # 3-1. 목적지 df디렉토리 확인하고 없으면 생성
+    # 목적지 df디렉토리 확인하고 없으면 생성
     try:
         if os.path.exists(dfdata_dir) == False:        # 폴더가 없으면 생성
             os.makedirs(dfdata_dir)
@@ -76,11 +77,11 @@ def to_card_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}'
             )
         raise(e)
     
-    # 3-2. dataframe 저장
+    # dataframe 저장
     try:
         df_filename = 'df_kicc_history_' + target_date      # 저장할 dataframe 파일 이름 'df_kicc_history_YYYYMMDD'
 
@@ -92,11 +93,11 @@ def to_card_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}'
             )
         raise(e)
     
-    # 3-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    # dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
     try:
         xl_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
@@ -108,7 +109,7 @@ def to_card_history_df():
                 f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
+                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}'
             )
         raise(e)
 

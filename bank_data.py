@@ -12,7 +12,7 @@ def to_bank_df():
     """다운로드 받은 기업은행, 농협(민국은행)의 입금 내역을 dataframe으로 저장한다
     첫째, 기업은행 입금 내역을 readlines함수로 한 줄씩 읽어, 각 줄을 '|' 구분자로 다시 분리한 후 dataframe으로 만들고 전처리 과정을 거친다.
     둘째, 농협(민국은행) 입금 내역을 BeautifulSoup 객체로 읽어들여, 
-
+    세째, 두 데이터를 합쳐 저장한다
     """    
     # 1. 기업은행에서 '텍스트형식저장'한 내역을 읽고 dataframe을 만든다
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
@@ -31,7 +31,9 @@ def to_bank_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + ibk_filename} : {e}\n'
             )
-        raise(e)
+        
+        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
+        return
     
     # 1-2. 리스트의 각 라인을 '|' 기준으로 분리한 후, dataframe을 만든다
     lines = list(map(lambda line: line.strip().split('|'), lines))      # '\n' 제거하고 '|' 단위로 분해

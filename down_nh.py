@@ -103,7 +103,11 @@ def down():
     down_base_dir = 'C:/Users/FA2/Downloads/'           # 파일이 다운로드된 디렉토리
     target_file_name = receips_date + '.xls'            # 오늘 날짜로 된 입금내역 YYYYMMDD.xls
 
-    todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
+    try:
+        todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
+    except:
+        print('down_nh : to_downdata error!!!')
+        return
 
 
 if __name__ == '__main__':

@@ -92,7 +92,11 @@ def down():
     down_base_dir = 'C:/Users/FA2/'         # 파일이 다운로드된 디렉토리
     target_file_name += '.xml'              # 파일 trial_balanceYYYYMMDD.xml     
 
-    todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
+    try:
+        todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
+    except:
+        print('down_opera : to_downdata error!!!')
+        return
 
 
 if __name__ == '__main__':

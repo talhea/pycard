@@ -31,7 +31,9 @@ def to_receipts_history_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> Pandas file-reading error {receipts_filename} : {e}'
             )
-        raise(e)
+        
+        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
+        return
 
     # 2. '입금예정일자' 컬럼명 수정 : 다른 dataframe과 통일
     receipts_history_df.rename(columns={'입금예정일자': 'date'}, inplace=True)     # '입금예정일자' 컬럼명 'date'로 수정

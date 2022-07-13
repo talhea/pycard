@@ -99,7 +99,11 @@ def down():
     down_base_dir = 'C:/Users/FA2/Downloads/'                           # 파일이 다운로드된 디렉토리
     target_file_name = '거래내역조회_입출식 예금' + receips_date + '.txt'   # 거래내역조회_입출식 예금YYYYMMDD.txt
 
-    todown.to_downdata(down_base_dir, target_file_name)     # 신용거래내역: 어제날짜
+    try:
+        todown.to_downdata(down_base_dir, target_file_name)     # 신용거래내역: 어제날짜
+    except:
+        print('down_ibk : to_downdata error!!!')
+        return
 
 
 if __name__ == '__main__':

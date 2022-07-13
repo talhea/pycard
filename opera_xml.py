@@ -31,7 +31,9 @@ def to_opera_df():
             print(
                 f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {dowmdata_dir + xml_filename} : {e}\n'
             )
-        raise(e)
+        
+        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
+        return
 
     # 2. trial balance 내용인 node(G_TRX_CODE tag : ) 추출
     g_trx_codes = xtree.findall('LIST_G_TRX_TYPE/G_TRX_TYPE/LIST_G_TRX_CODE/G_TRX_CODE')

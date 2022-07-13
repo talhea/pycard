@@ -27,7 +27,7 @@ def to_downdata(source_dir: str, target_file: str) -> None:
                 f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}\n'
+                f'===[{__name__}.py] <{datetime.datetime.now()}> mkdir error {target_dir} : {e}'
             )
         raise(e)
 
@@ -40,7 +40,7 @@ def to_downdata(source_dir: str, target_file: str) -> None:
                 f'[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}\n'
             )
             print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}\n'
+                f'===[{__name__}.py] <{datetime.datetime.now()}> move error {target_file} : {e}'
             )
         raise(e)
 
