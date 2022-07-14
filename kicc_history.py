@@ -52,7 +52,9 @@ def to_card_history_df():
     card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
     
     # 2-6. 이전(2일 전) 거래내역에 포함된 내역 제거
-    card_history_df = card_history_df[card_history_df['거래고유번호'].isin(red_font.read_red_color()) == False]     # inin()결과가 False 인 것
+    del_reds = red_font.read_red_color()
+    if len(del_reds) != 0:
+        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_reds) == False]      # isin()결과가 False 인 것
     
     # 2-7. 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
