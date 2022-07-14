@@ -86,39 +86,45 @@ def to_bank_df():
     # 5-1. 내용 추출
     content_soup = soup.select('td.se-td')      # 입출금내역을 beautifulsoup 객체로 읽어들임, 한 라인의 각 컬럼을 리스트 형식으로 저장
     row_lst = []                                # DataFrame 생성에 사용할 line buffer, 컬렴명이나 인텍스 없는 내용만 저장
-
+    
     for content in content_soup:                # 각 컬럼을 looping
         row_lst.append(re.sub('([0-9,]+) 원', '\\1', content.get_text().strip()))   # text 주변의 공백을 제거한 내용 추출
 
-    # 5-2. content 리스트를 dataframe으로 변환 ['날짜', '출금', '입금', '잔액', '적요']
-    nh_df = pnds.DataFrame([row_lst], columns=['date', 'drawing', 'receipts', 'balance', 'holder'])
+    if len(content_soup) >= 5:                  # 입금 내역이 있을때만, 입금 내역이 있다면 최소한 5 이상의 길이(컬럼 수가 5개)가 나온다
+        # 5-2. content 리스트를 dataframe으로 변환 ['날짜', '출금', '입금', '잔액', '적요']
+        nh_df = pnds.DataFrame([row_lst], columns=['date', 'drawing', 'receipts', 'balance', 'holder'])
 
-    # 6. data 전처리
-    # 6-1. 날짜 포맷 : '%Y-%m-%d %H:%M:%S' => 두 dataframe 통합 후에 정렬 및 날짜포맷 적용을 위함
-    nh_df['date'] = nh_df['date'].astype('datetime64[ns]', errors='ignore')     # date 포맷 변경을 위해서 datetime 형으로 변환
-    nh_df['date'] = nh_df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')              # 연산을 통해 포맷 변경 => 반환 타입은 일반 객체로 변경됨
+        # 6. data 전처리
+        # 6-1. 날짜 포맷 : '%Y-%m-%d %H:%M:%S' => 두 dataframe 통합 후에 정렬 및 날짜포맷 적용을 위함
+        nh_df['date'] = nh_df['date'].astype('datetime64[ns]', errors='ignore')     # date 포맷 변경을 위해서 datetime 형으로 변환
+        nh_df['date'] = nh_df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')              # 연산을 통해 포맷 변경 => 반환 타입은 일반 객체로 변경됨
 
-    # 6-2. 천단위 ','를 없애고 금액 타입을 'int64'로 변경
-    nh_df['receipts'] = nh_df['receipts'].str.replace(',', '').astype('int64', errors='ignore')
+        # 6-2. 천단위 ','를 없애고 금액 타입을 'int64'로 변경
+        nh_df['receipts'] = nh_df['receipts'].str.replace(',', '').astype('int64', errors='ignore')
 
-    # 6-3. 'details' 컬럼 추가하고, 필요한 컬럼만 추출
-    nh_df['details'] = 'NH11381135'
-    nh_df = nh_df[['date', 'receipts', 'details', 'holder']]
+        # 6-3. 'details' 컬럼 추가하고, 필요한 컬럼만 추출
+        nh_df['details'] = 'NH11381135'
+        nh_df = nh_df[['date', 'receipts', 'details', 'holder']]
 
-    # 6-4. NH카드에서 입금된 라인의 holder 값을 'NH'로 바꿈
-    str_expr = "holder.str.startswith('NH11381135')"        # NH로 시작하는 문자열
-    nh_lst = nh_df.query(str_expr).index.tolist()           # 조건 부합하는 열 값을 가진 행을 추출
-    nh_df.loc[nh_lst, 'holder'] = 'NH'                      # nh_lst 리스트에 있는 행들의 'holder'컬럼 값을 'NH'로 변경
+        # 6-4. NH카드에서 입금된 라인의 holder 값을 'NH'로 바꿈
+        str_expr = "holder.str.startswith('NH11381135')"        # NH로 시작하는 문자열
+        nh_lst = nh_df.query(str_expr).index.tolist()           # 조건 부합하는 열 값을 가진 행을 추출
+        nh_df.loc[nh_lst, 'holder'] = 'NH'                      # nh_lst 리스트에 있는 행들의 'holder'컬럼 값을 'NH'로 변경
 
-    # 7. NH카드 입금 라인만 추출
-    nh_df = nh_df[nh_df['holder'].isin(['NH'])]
+        # 7. NH카드 입금 라인만 추출
+        nh_df = nh_df[nh_df['holder'].isin(['NH'])]
+    else:       # 입금내역이 없으므로 None 셋팅
+        nh_df = None
 
     #------------------------------------------------------------------------------------------------------------------
     # 농협 끝, 기업은행과 눙협 합치기
     #------------------------------------------------------------------------------------------------------------------
 
     # 8. 기업은행 데이타프레임(ibk_df)와 농협 데이타프레임(nh_df)를 합친다
-    bank_df = pnds.concat([ibk_df, nh_df], ignore_index=True)
+    if nh_df != None:                           # 입금 내역이 있을때만 합침
+        bank_df = pnds.concat([ibk_df, nh_df], ignore_index=True)
+    else:
+        bank_df = ibk_df
 
     # 9. data 전처리
     # 9-1. 거래일시 기준 Sorting
@@ -153,7 +159,19 @@ def to_bank_df():
                 f'[bank_data.py - Making Dataframe] <{datetime.datetime.now()}> pickle.dump error ({df_filename}) ===> {e}\n'
             )
         raise(e)
-
+    
+    # 10-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    try:
+        xl_filename = df_filename + '.xlsx'         # 저장파일 'df_bank_YYYYMMDD.xlsx'
+        
+        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
+            bank_df.to_excel(writer, sheet_name=f'{receipts_date}', index=False)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[kicc_history.py - Making Excel] <{datetime.datetime.now()}> Pandas.ExcelWriter error ({xl_filename}) ===> {e}\n'
+            )
+        raise(e)
 
 if __name__ == '__main__':
     to_bank_df()
