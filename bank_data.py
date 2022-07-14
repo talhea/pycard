@@ -17,7 +17,8 @@ def to_bank_df():
     # 1. 기업은행에서 '텍스트형식저장'한 내역을 읽고 dataframe을 만든다
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     receipts_date = datetime.datetime.now().strftime("%Y%m%d")                          # 입금 오늘 날짜
-    downdata_dir = './downdata/' + target_date + '/'                                    # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
+    
+    downdata_dir = f'./data/{target_date}/downdata/'                                    # 읽어들일 down디렉토리 './data//YYYYMMDD/downdata/'
     ibk_filename = '거래내역조회_입출식 예금' + receipts_date  + '.txt'                     # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
@@ -27,18 +28,13 @@ def to_bank_df():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + ibk_filename} : {e}\n'
+                f'[bank_data.py - Reading Data] <{datetime.datetime.now()}> file-reading error ({ibk_filename}) ===> {e}\n'
             )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + ibk_filename} : {e}\n'
-            )
-        
-        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
-        return
+        raise(e)
     
-    # 1-2. 리스트의 각 라인을 '|' 기준으로 분리한 후, dataframe을 만든다
+    # 1-2. 리스트의 각 라인을 '|' 기준으로 분리해서 dataframe을 만든다
     lines = list(map(lambda line: line.strip().split('|'), lines))      # '\n' 제거하고 '|' 단위로 분해
-    ibk_df = pnds.DataFrame(lines)                              # DataFrame 생성
+    ibk_df = pnds.DataFrame(lines)                                      # DataFrame 생성
 
     # 2. 데이터 전처리
     # 2-1. 필요 컬럼 추출하고 컬럼명 변경
@@ -54,16 +50,16 @@ def to_bank_df():
     ibk_df = ibk_df.replace({'holder': '삼성카드（주）'}, 'SS')
     ibk_df = ibk_df.replace({'holder': '신한카드（주）'}, 'SH')
     ibk_df = ibk_df.replace({'holder': '하나카드　주식회사'}, 'KEB')
-    ibk_df = ibk_df.replace({'holder': '비씨카드（주）'}, 'BC')             # 해외카드 승인된 BC가 입금될때
+    ibk_df = ibk_df.replace({'holder': '비씨카드（주）'}, 'BC')                 # 해외카드 승인된 BC가 입금될때
 
-    # details 컬럼에 'BC' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경     # 국내 승인된 BC가 입금될떄
+    # 2-4. details 컬럼에 'BC' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경    # 국내 승인된 BC가 입금될떄
     bc_expr = "details.str.endswith('BC')"          # BC로 끝나는 문자열
-    bc_lst = ibk_df.query(bc_expr).index.tolist()  # 조건 부합하는 열 값을 가진 행을 추출
+    bc_lst = ibk_df.query(bc_expr).index.tolist()   # 조건 부합하는 열 값을 가진 행을 추출
     ibk_df.loc[bc_lst, 'holder'] = 'BC'             # kb_lst 리스트에 포함된 모든 행의 'holder'컬럼 값 'KB'로 변경
 
-    # details 컬럼에 'KB' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경
-    kb_expr = "details.str.startswith('KB')"       # KB로 시작하는 문자열
-    kb_lst = ibk_df.query(kb_expr).index.tolist()  # 조건 부합하는 열 값을 가진 행을 추출
+    # 2-5. details 컬럼에 'KB' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경
+    kb_expr = "details.str.startswith('KB')"        # KB로 시작하는 문자열
+    kb_lst = ibk_df.query(kb_expr).index.tolist()   # 조건 부합하는 열 값을 가진 행을 추출
     ibk_df.loc[kb_lst, 'holder'] = 'KB'             # kb_lst 리스트에 포함된 모든 행의 'holder'컬럼 값 'KB'로 변경
 
     # 3. 카드사 입금 거래 내역만 추출
@@ -78,14 +74,11 @@ def to_bank_df():
     
     try:
         with open(downdata_dir + nh_filename, 'rt', encoding='UTF-8') as page:
-            soup = BeautifulSoup(page, 'html.parser')
+            soup = BeautifulSoup(page, 'html.parser')                           # BeautifulSoup 객체로 읽어들임
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> file-reading error {downdata_dir + nh_filename} : {e}'
+                f'[bank_data.py - Reading Data] <{datetime.datetime.now()}> file-reading error ({nh_filename}) ===> {e}\n'
             )
         raise(e)
 
@@ -101,18 +94,18 @@ def to_bank_df():
     nh_df = pnds.DataFrame([row_lst], columns=['date', 'drawing', 'receipts', 'balance', 'holder'])
 
     # 6. data 전처리
-    # 날짜 포맷 : '%Y-%m-%d %H:%M:%S' => 두 dataframe 통합 후에 정렬 및 날짜포맷 적용을 위함
+    # 6-1. 날짜 포맷 : '%Y-%m-%d %H:%M:%S' => 두 dataframe 통합 후에 정렬 및 날짜포맷 적용을 위함
     nh_df['date'] = nh_df['date'].astype('datetime64[ns]', errors='ignore')     # date 포맷 변경을 위해서 datetime 형으로 변환
     nh_df['date'] = nh_df['date'].dt.strftime('%Y-%m-%d %H:%M:%S')              # 연산을 통해 포맷 변경 => 반환 타입은 일반 객체로 변경됨
 
-    # 천단위 ','를 없애고 금액 타입을 'int64'로 변경
+    # 6-2. 천단위 ','를 없애고 금액 타입을 'int64'로 변경
     nh_df['receipts'] = nh_df['receipts'].str.replace(',', '').astype('int64', errors='ignore')
 
-    # 'details' 컬럼 추가하고, 필요한 컬럼만 추출
+    # 6-3. 'details' 컬럼 추가하고, 필요한 컬럼만 추출
     nh_df['details'] = 'NH11381135'
     nh_df = nh_df[['date', 'receipts', 'details', 'holder']]
 
-    # NH카드에서 입금된 라인의 holder 값을 'NH'로 바꿈
+    # 6-4. NH카드에서 입금된 라인의 holder 값을 'NH'로 바꿈
     str_expr = "holder.str.startswith('NH11381135')"        # NH로 시작하는 문자열
     nh_lst = nh_df.query(str_expr).index.tolist()           # 조건 부합하는 열 값을 가진 행을 추출
     nh_df.loc[nh_lst, 'holder'] = 'NH'                      # nh_lst 리스트에 있는 행들의 'holder'컬럼 값을 'NH'로 변경
@@ -128,26 +121,23 @@ def to_bank_df():
     bank_df = pnds.concat([ibk_df, nh_df], ignore_index=True)
 
     # 9. data 전처리
-    # 거래일시 기준 Sorting
+    # 9-1. 거래일시 기준 Sorting
     bank_df = bank_df.sort_values(by=['date'])
 
-    # 날짜 포맷 : '%Y-%m-%d'
+    # 9-2. 날짜 포맷 : '%Y-%m-%d'
     bank_df['date'] = bank_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore') # 날짜 포맷 : '%Y-%m-%d'
     
     # 10. df디렉토리에 dataframe 저장
-    dfdata_dir = './dfdata/' + target_date + '/'       # 데이타를 저장할 df디렉토리 './dfdata/YYYYMMDD/'
+    dfdata_dir = f'./data/{target_date}/dfdata/'        # 데이타를 저장할 df디렉토리 './data/YYYYMMDD/dfdata/'
     
     # 10-1. 목적지 df디렉토리 확인하고 없으면 생성
     try:
-        if os.path.exists(dfdata_dir) == False:        # 폴더가 없으면 생성
+        if os.path.exists(dfdata_dir) == False:         # 폴더가 없으면 생성
             os.makedirs(dfdata_dir)
     except Exception as e:
         with open('./error.log', 'a') as file:          # error 로그 파일에 추가
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
+                f'[bank_data.py - Making dfdata] <{datetime.datetime.now()}> mkdir error ({dfdata_dir}) ===> {e}\n'
             )
         raise(e)
     
@@ -160,10 +150,7 @@ def to_bank_df():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {df_filename} : {e}\n'
+                f'[bank_data.py - Making Dataframe] <{datetime.datetime.now()}> pickle.dump error ({df_filename}) ===> {e}\n'
             )
         raise(e)
 

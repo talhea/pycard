@@ -7,7 +7,6 @@ import moving_to_folder as todown
 
 def down():
     receips_date = datetime.datetime.now().strftime("%Y%m%d")                           # 오늘 입금 내역
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -106,13 +105,9 @@ def down():
 
     # 다운로드 받는 파일을 down디렉토리로 이동
     down_base_dir = 'C:/Users/FA2/Downloads/'           # 파일이 다운로드된 디렉토리
-    target_file_name = receips_date + '.xls'            # 오늘 날짜로 된 입금내역 YYYYMMDD.xls
+    target_filename = receips_date + '.xls'             # 오늘 날짜로 된 입금내역 'YYYYMMDD.xls'
 
-    try:
-        todown.to_downdata(down_base_dir, target_file_name) # 파일 이동
-    except:
-        print('down_nh : to_downdata error!!!')
-        return
+    todown.to_downdata(down_base_dir, target_filename)  # 파일 이동
 
 
 if __name__ == '__main__':

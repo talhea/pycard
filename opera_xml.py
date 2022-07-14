@@ -18,22 +18,17 @@ def to_opera_df():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     # 임시
     # target_date = '20220710'
-    dowmdata_dir = './downdata/' + target_date + '/'                   # 읽어들일 down디렉토리 './downdata/YYYYMMDD'
+    dowmdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     
     try:
-        xtree = et.parse(dowmdata_dir + xml_filename)                  # ElementTree 객체로 읽어들임
+        xtree = et.parse(dowmdata_dir + xml_filename)                   # ElementTree 객체로 읽어들임
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {dowmdata_dir + xml_filename} : {e}\n'
+                f'[opera_xml.py - Rading Data] <{datetime.datetime.now()}> ElementTree file-reading error ({xml_filename}) ===> {e}\n'
             )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> ElementTree file-reading error {dowmdata_dir + xml_filename} : {e}\n'
-            )
-        
-        # 파일 읽기에 실패했으므로 이 함수 과정만 종료, 프로그램 전체를 종료시키지 않는다(raise(e)를 사용하지 않는 이유)
-        return
+        raise(e)
 
     # 2. trial balance 내용인 node(G_TRX_CODE tag : ) 추출
     g_trx_codes = xtree.findall('LIST_G_TRX_TYPE/G_TRX_TYPE/LIST_G_TRX_CODE/G_TRX_CODE')
@@ -84,19 +79,16 @@ def to_opera_df():
     opera_df.set_index('TRX_CODE', drop=True, inplace=True)
 
     # 6. dataframe과 엑셀로 각 각 저장
-    dfdata_dir = './dfdata/' + target_date + '/'       # 저장폴더 './dfdata/YYYYMMDD/'
+    dfdata_dir = f'./data/{target_date}/dfdata/'        #  dfdata 디렉토리 './data/YYYYMMDD/dfdata/'
 
     # 6-1. 목적지 df디렉토리 확인하고 없으면 생성
     try:
-        if os.path.exists(dfdata_dir) == False:        # 폴더가 없으면 생성
+        if os.path.exists(dfdata_dir) == False:         # 폴더가 없으면 생성
             os.makedirs(dfdata_dir)
     except Exception as e:
         with open('./error.log', 'a') as file:          # error 로그 파일에 추가
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> mkdir error {dfdata_dir} : {e}\n'
+                f'[opera_xml.py - Making dfdata] <{datetime.datetime.now()}> mkdir error ({dfdata_dir}) ===> {e}\n'
             )
         raise(e)
 
@@ -108,10 +100,7 @@ def to_opera_df():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dfdata_dir + df_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle.dump error {dfdata_dir + df_filename} : {e}\n'
+                f'[opera_xml.py - Making Dataframe] <{datetime.datetime.now()}> pickle.dump error ({df_filename}) ===> {e}\n'
             )
         raise(e)
 
@@ -124,10 +113,7 @@ def to_opera_df():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> Pandas.ExcelWriter error {dfdata_dir + xl_filename} : {e}\n'
+                f'[opera_xml.py - Making Excel] <{datetime.datetime.now()}> Pandas.ExcelWriter error ({xl_filename}) ===> {e}\n'
             )
         raise(e)
 

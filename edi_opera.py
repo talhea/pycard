@@ -19,10 +19,7 @@ def merge_edi_opera():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl file-reading error {excel_filename} : {e}\n'
+                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
             )
         raise(e)
 
@@ -36,7 +33,7 @@ def merge_edi_opera():
     # 임시
     # target_date = '20220710'
     
-    dfdata_dir = './dfdata/' + target_date + '/'
+    dfdata_dir = f'./data/{target_date}/dfdata/'                # 읽어들일 dfdata디렉토리 './data//YYYYMMDD/dfdata/'
     opera_df_filename = 'df_opera_trial_' + target_date
     
     try:
@@ -45,15 +42,11 @@ def merge_edi_opera():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + opera_df_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + opera_df_filename} : {e}\n'
+                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({opera_df_filename}) ===> {e}\n'
             )
         raise(e)
     
-    # 3. 오페라 dataframe의 trx_code와 EDI 엑셀 book 컬럼 좌표 매칭 정보
-    # card transaction code와 EDI 엑셀파일의 관련 정보('BOOK', 'ACTUAL' 등)
+    # 3. 오페라 dataframe의 trx_code와 EDI 엑셀파일 관련 매칭 정보
     mapping_code_edi = {
         # 'TRX_CODE' : ['Book' EDI엑셀좌표, 'Actual' EDI엑셀좌표, [actual 금액 리스트]]
         '9231': {'book': 'B7', 'actual': 'C7', 'amounts': []},
@@ -74,7 +67,7 @@ def merge_edi_opera():
     }
 
     # 4. trial balance 내용을 순서대로 돌면서 엑셀에 입력(mapping_code_edi 참조)
-    for code in opera_df.index:     # trx-code를 이용해서 ws와 opera_df에 접근하는 looping
+    for code in opera_df.index:                                         # trx-code를 이용해서 ws와 opera_df에 접근하는 looping
         ws[mapping_code_edi[code]['book']] = opera_df.loc[code]['TB_AMOUNT'] * -1       # 오페라 dataframe으로부터 tb_amount 정보를 가져와, 
                                                                                         # 맵핑 딕셔너리에서 추출한 좌표를 이용해서 ws(EDI엑셀)에 넣는다
     
@@ -82,7 +75,7 @@ def merge_edi_opera():
     # KICC 신용카드 승인내역의 금액을 카드별로 분류하여 EDI 엑셀 파일('Actual')에 입력
     #------------------------------------------------------------------------------------------------------------------
     
-    # 5. KICC로부터 생성한 신용카드 승인내역 dataframe('df_kicc_history_YYYYMMDDxlsx')을 로딩
+    # 5. KICC로부터 생성한 신용카드 승인내역 dataframe
     card_df_filename = 'df_kicc_history_' + target_date                    # 파일 이름: df_kicc_history_YYYYMMDD
 
     try:
@@ -91,10 +84,7 @@ def merge_edi_opera():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + card_df_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> pickle file-reading error {dfdata_dir + card_df_filename} : {e}'
+                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({card_df_filename}) ===> {e}\n'
             )
         raise(e)
     
@@ -191,10 +181,7 @@ def merge_edi_opera():
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}\n'
-            )
-            print(
-                f'[{__name__}.py] <{datetime.datetime.now()}> openpyxl wirting error {excel_filename} : {e}'
+                f'[edi_opera.py - Making Data] <{datetime.datetime.now()}> openpyxl wirting error ({excel_filename}) ===> {e}\n'
             )
         raise(e) 
 
