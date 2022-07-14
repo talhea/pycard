@@ -32,7 +32,7 @@ def to_downdata(source_dir: str, target_file: str) -> None:
 
     # 3. 목적지 디렉토리로 파일 옮기기
     try:        
-        shutil.move(source_dir + target_file, target_dir)   # './data/YYYYMMDD/downdata/파일'
+        shutil.move(source_dir + target_file, target_dir)   # 이동: './data/YYYYMMDD/downdata/{target_file}'
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(

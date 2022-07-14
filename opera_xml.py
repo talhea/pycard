@@ -6,7 +6,6 @@ import pandas as pnds
 import xml.etree.ElementTree as et
 import pickle, os
 import datetime
-#from IPython.display import display
 
 def to_opera_df():
     """다운로드 받은 오페라 trial balance를 dataframe과 엑셀로 각 각 저장

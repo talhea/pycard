@@ -89,87 +89,87 @@ def merge_edi_opera():
         raise(e)
     
     # 6. EDI 엑셀에 입력하기위한 카드 분류
-    # '카드분류' 컬럼 생성
+    # 6-1. '카드분류' 컬럼 생성
     card_history_df['카드분류'] = '분류'        # 'LT', 'KEB', 'JCB', 'VISA', 'MASTER', 'SA', 'SS', 'SH', 'BC', 'KB', 'HD', 'NH', 'CITI'
 
-    # 'LT'
+    # 6-2. 'LT'
     condition = (card_history_df['매입카드사'].str.startswith('롯데', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9244'
 
-    # 'KEB'
+    # 6-3. 'KEB'
     condition = (card_history_df['매입카드사'] == '하나구외환')  & (card_history_df['발급카드사'].str.startswith('하나', na=False) | card_history_df['발급카드사'].str.startswith('토스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9243'
 
-    # 'JCB'
+    # 6-4. 'JCB'
     condition = (card_history_df['발급카드사'].str.contains('제이씨비', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9235'
 
-    # 'VISA'
+    # 6-5. 'VISA'
     condition = (card_history_df['발급카드사'].str.contains('해외비자', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9231'
 
-    # 'MASTER'
+    # 6-6. 'MASTER'
     condition = (card_history_df['발급카드사'].str.contains('해외마스타', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9233'
 
-    # 'SA'
+    # 6-7. 'SA'
     condition = (card_history_df['발급카드사'].str.contains('해외아멕스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9232'
 
-    # 'SS'
+    # 6-8. 'SS'
     condition = (card_history_df['발급카드사'].str.startswith('삼성', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9239'
 
-    # 'SH'
+    # 6-9. 'SH'
     condition = (card_history_df['매입카드사'].str.startswith('신한', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9242'
 
-    # 'BC'
+    # 6-10. 'BC'
     condition = (card_history_df['매입카드사'].str.startswith('비씨', na=False))      # 'CITI'씨티카드와 중복되지만, 'CITI'는 마지막에 다시 셋팅
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9237'
 
-    # 'KB'
+    # 6-11. 'KB'
     condition = (card_history_df['매입카드사'].str.startswith('국민', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9238'
 
-    # 'HD'
+    # 6-12. 'HD'
     condition = (card_history_df['매입카드사'].str.startswith('현대', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9245'
 
-    # 'NH'
+    # 6-13. 'NH'
     condition = (card_history_df['매입카드사'].str.startswith('NH', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9240'
 
-    # 'CITI'
+    # 6-14. 'CITI'
     condition = (card_history_df['발급카드사'].str.startswith('씨티', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9241'
     
-    # 7. datframe 카드분류 컬럼에 따라서 해당 금액을 EDI 엑셀에 수식 문자열로 입력
-    # dataframe 코드별 금액을 mapping_code_edi의 'amounts'리스트에 추가
-    for index, row in card_history_df.iterrows():                               # dataframe row looping
+    # 7. datframe 카드분류 컬럼에 따라서 해당 금액을 EDI 엑셀에 수식 문자열로 입력 (예, '=+50000+10000...')
+    # 7-1. dataframe 코드별 금액을 mapping_code_edi의 'amounts'리스트에 추가
+    for index, row in card_history_df.iterrows():                   # dataframe row looping
         mapping_code_edi[row['카드분류']]['amounts'].append(f"+{row['금액']}")  # 금액을 엑셀 수식 문자열로 저장
     
-    # 'amounts' 금액리스트를 엑셀 서식 문자열로 edi 엑셀 파일에 저장
-    for edi in mapping_code_edi.values():                           # EDI 관련 딕셔너리 리스트를 looping
+    # 7-2. 'amounts' 금액리스트를 엑셀 서식 문자열로 edi 엑셀 파일에 저장
+    for edi in mapping_code_edi.values():                   # EDI 관련 딕셔너리 리스트를 looping
         if len(edi['amounts']) != 0:                                # 해당 날짜의 카드 매출이 있는 것만
-            ws[edi['actual']] = '=' + (''.join(edi['amounts']))     # 'amounts'를 엑셀 수식으로 결합해서 EDI엑셀의 'actual'좌표에 입력
+            ws[edi['actual']] = '=' + (''.join(edi['amounts']))     # 'amounts'를 엑셀 수식으로 결합해서 EDI엑셀의 'actual'좌표에 입력 (예, '=+50000+10000...')
     
     # 8. sheet 이름 및 날짜 셋팅
     opera_date = yesterday.strftime('%b.%d.%Y')     # 오페라용 어제 날짜 포맷
-    ws['B1'] = opera_date                           # EDI파일 날짜 셋팅
+    ws['B1'] = opera_date                           # EDI 엑셀파일 날짜 셋팅
     
     ws.title = str(yesterday.day)                   # sheet 이름 변경
     
@@ -184,6 +184,7 @@ def merge_edi_opera():
                 f'[edi_opera.py - Making Data] <{datetime.datetime.now()}> openpyxl wirting error ({excel_filename}) ===> {e}\n'
             )
         raise(e) 
+
 
 if __name__ == '__main__':
     merge_edi_opera()
