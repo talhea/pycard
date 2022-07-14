@@ -5,7 +5,7 @@
 import pandas as pnds
 import pickle, os
 import datetime
-
+import font_red_on_excel as red_font
 
 def to_card_history_df():
     """다운로드 받은 KICC 신용카드 거래내역을 dataframe으로 저장한다
@@ -23,7 +23,8 @@ def to_card_history_df():
                                         card_filename, header=0, thousands = ',',           # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
                                         dtype={'거래고유번호': str,                         # 너무 큰 숫자들이므로 문자열로 셋팅
                                                 '금액': 'int64',
-                                                '승인번호': str}                            # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
+                                                '승인번호': str},                           # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
+                                        na_values=None
                                         )
     except Exception as e:
         with open('./error.log', 'a') as file:
@@ -41,7 +42,8 @@ def to_card_history_df():
 
     # 2-3. '승인번호' 중복 라인제거 == 당일 취소 건 제거
     card_history_df.drop_duplicates(subset=['승인번호'], keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
-
+    
+    
     # 2-4. '승인구분'이 '승인' 라인 추출
     card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
 
@@ -49,14 +51,17 @@ def to_card_history_df():
     date_str = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")  # 어제 날짜 포맷
     card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
     
-    # 2-6. 필요한 컬럼만 추출
+    # 2-6. 이전(2일 전) 거래내역에 포함된 내역 제거
+    card_history_df = card_history_df[card_history_df['거래고유번호'].isin(red_font.read_red_color()) == False]     # inin()결과가 False 인 것
+    
+    # 2-7. 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
-                                        '카드번호', '발급카드사', '매입카드사', '금액']]
-
-    # 2-7. date 기준 sorting
+                                        '카드번호', '발급카드사', '매입카드사', '금액', '할부개월']]
+    
+    # 2-8. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # 2-8. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
+    # 2-9. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
     card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. df디렉토리에 dataframe 저장
