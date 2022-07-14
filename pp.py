@@ -11,6 +11,7 @@ import preparation
 
 # 실행 결과 저장 버퍼
 result_for_processing = {
+    # 'procee 이름(모듈 이름)' : {'exex': 실행할 함수이름, 'result': 실행결과 bool}
     'preparation': {'exec': preparation.ready, 'result': False},
     'down_opera': {'exec': down_opera.down, 'result': False},
     'down_kicc': {'exec': down_kicc.down, 'result': False},
@@ -20,14 +21,18 @@ result_for_processing = {
     'kicc_receipts': {'exec': kicc_receipts.to_receipts_history_df, 'result': False},
     'edi_opera': {'exec': edi_opera.merge_edi_opera, 'result': False},
     'down_ibk': {'exec': down_ibk.down, 'result': False},
-    'edi_opera': {'exec': edi_opera.merge_edi_opera, 'result': False},
     'bank_data': {'exec': bank_data.to_bank_df, 'result': False},
 }
+
+# 시간 타이머
+start_time = datetime.datetime.now()            # 시작 시간
+end_time, diff_time = 0, 0                      # 끝 시간, 시간 차이 
 
 # 모든 처리결과('result')가 True일때까지  process 반복 실행
 def processing_pkg():
     while True:
         count = len(result_for_processing)                  # 처리 길이 만큼 count 셋팅
+        
         for proc, item in result_for_processing.items():
             if item['result'] == False:                     # 결과가 False면 prcess 실행
                 item['result'] = item['exec']()
@@ -40,10 +45,15 @@ def processing_pkg():
         
         if count <= 0:      # 0보다 작거나 같으면 처리 결과가 모두 True 이므로 재시도 종료
             print('count가 0 보다 작거나 같음: 종료')
-            break
+            break                                           # 종료
         else:
-            print('While 반복 지연 5초')
-            time.sleep(5)
+            print('While 반복 지연 5초')                    # 재시작 지연 시간(초) 10분
+            time.sleep(600)
+        
+        end_time = datetime.datetime.now()                  # 종료 시간
+        diff_time = end_time - start_time
+        if (diff_time.seconds / 3600) >= 1:                 # 1시간이 지나면
+            break                                           # 종료
 
 schedule.every().day.at("13:01").do(processing_pkg)
 

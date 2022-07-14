@@ -62,8 +62,8 @@ def down():
     gui.doubleClick()
     gui.sleep(1)
 
-    target_file_name = "trial_balance" + target_date     # trial_balance20220701
-    gui.write(target_file_name, interval=0.4)
+    target_filename = "trial_balance" + target_date     # trial_balance20220701
+    gui.write(target_filename, interval=0.4)
     gui.sleep(2)
 
     gui.moveTo(1005, 547)

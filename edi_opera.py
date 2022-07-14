@@ -174,9 +174,12 @@ def merge_edi_opera():
     ws.title = str(yesterday.day)                   # sheet 이름 변경
     
     # 9. 파일 저장
+    target_dir = f'./data/{target_date}/'           # 날짜 폴더에 저장 '/data/YYYYMMDD/'
+    
     try:
-        excel_filename = dfdata_dir + 'EDI-' + target_date + '.xlsx'              # 파일 저장 시에 필요한 당 월의 엑셀파일 이름
+        excel_filename = target_dir + 'EDI-' + target_date + '.xlsx'              # '/data/YYYYMMDD/EDI-YYYYMMDD.xlsx'
         print(excel_filename)
+        
         edi_excel.save(excel_filename)
     except Exception as e:
         with open('./error.log', 'a') as file:
