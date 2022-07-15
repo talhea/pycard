@@ -70,7 +70,7 @@ def to_receipts_history_df():
         xl_filename = 'df_kicc_receipts_' + target_date + '.xlsx'    # 저장파일 'df_kicc_receipts_YYYYMMDD.xlsx
         
         with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
-            receipts_history_df.to_excel(writer, mode='w', sheet_name='original', index=False, engine='openpyxl')
+            receipts_history_df.to_excel(writer, sheet_name='original', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
