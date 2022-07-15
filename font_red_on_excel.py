@@ -21,6 +21,7 @@ def read_red_color() -> list:
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
     excel_filename = source_dir + f'신용거래내역조회_{source_date}.xlsx'                    # 2일 전 신용거래내역조회 파일
     
+    #   openpyxl excel 파일 로딩해서 ws 객체 셋팅
     try:
         edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
         ws = edi_excel[edi_excel.sheetnames[1]]                             # 두번쨰 shhet 선택
@@ -30,13 +31,16 @@ def read_red_color() -> list:
                 f'[font_red_on_excel.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
             )
         raise(e)
-
+    
+    #   for문을 통해 각 row의 font color를 판단 후 리스트 추출
     red_rows = []                           # 거래고유번호 리스트 
     for row in ws.iter_rows():              # row looping
         if row[0].font.color.rgb == 'FFFF0000':             # 해당 라인의 첫번쨰 셀의 font color가 red일 경우만.
             red_rows.append(row[0].value)                   # 해당 '거래고유번호'를 리스트에 추가
     
-    return red_rows                         # 리스트 반환
+    # 2. '거래고유번호' 리스트 반환
+    return red_rows
+
 
 if __name__ == '__main__':
     print(read_red_color())
