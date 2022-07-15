@@ -2,6 +2,7 @@
 다운로드 받은 KICC 입금 현황을 dataframe으로 저장한다
 """  
 
+from statistics import mode
 import pandas as pnds
 import pickle, os
 import datetime
@@ -61,6 +62,19 @@ def to_receipts_history_df():
         with open('./error.log', 'a') as file:
             file.write(
                 f'[kicc_receipts - Making Dataframe] <{datetime.datetime.now()}> pickle.dump error ({df_filename}) ===> {e}\n'
+            )
+        raise(e)
+    
+    # 4-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    try:
+        xl_filename = 'df_kicc_receipts_' + target_date + '.xlsx'    # 저장파일 'df_kicc_receipts_YYYYMMDD.xlsx
+        
+        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
+            receipts_history_df.to_excel(writer, mode='w', sheet_name='original', index=False, engine='openpyxl')
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[kicc_history.py - Making Excel] <{datetime.datetime.now()}> Pandas.ExcelWriter error ({xl_filename}) ===> {e}\n'
             )
         raise(e)
 

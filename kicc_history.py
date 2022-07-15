@@ -97,7 +97,7 @@ def to_card_history_df():
     try:
         xl_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
-        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
+        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
             card_history_df.to_excel(writer, sheet_name='original', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:

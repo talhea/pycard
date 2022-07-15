@@ -16,12 +16,13 @@ def read_red_color() -> list:
     Returns:
         list: {'거래고유번호' ...}
     """    
-    # 1. 2일 전 마감된 신용카드 거래 내역 파일을 읽는다
-    source_date = (datetime.datetime.now() - datetime.timedelta(2)).strftime("%y%m%d")      # 저장된 '신용거래내역_YYMMDD'용 날짜 포맷, 2일 전 날짜
+    # 1. 2일 전 마감된 신용카드 거래 내역 파일 로딩
+    # 1-1. 날짜 와 파일명 셋팅
+    source_date = (datetime.datetime.now() - datetime.timedelta(2)).strftime("%y%m%d")  # 2일 전 날짜 포맷
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
-    excel_filename = source_dir + f'신용거래내역조회_{source_date}.xlsx'                    # 2일 전 신용거래내역조회 파일
+    excel_filename = source_dir + f'신용거래내역조회_{source_date}.xlsx'                    # 2일 전 날짜의 '신용거래내역_YYMMDD.xlsx' 파일
     
-    #   openpyxl excel 파일 로딩해서 ws 객체 셋팅
+    # 1-2. excel 파일 로딩해서 ws 객체 셋팅
     try:
         edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
         ws = edi_excel[edi_excel.sheetnames[1]]                             # 두번쨰 shhet 선택
@@ -32,13 +33,13 @@ def read_red_color() -> list:
             )
         raise(e)
     
-    #   for문을 통해 각 row의 font color를 판단 후 리스트 추출
+    # 2. for문을 통해 각 row의 font color를 판단 후 리스트 추출
     red_rows = []                           # 거래고유번호 리스트 
     for row in ws.iter_rows():              # row looping
         if row[0].font.color.rgb == 'FFFF0000':             # 해당 라인의 첫번쨰 셀의 font color가 red일 경우만.
             red_rows.append(row[0].value)                   # 해당 '거래고유번호'를 리스트에 추가
     
-    # 2. '거래고유번호' 리스트 반환
+    # 3. '거래고유번호' 리스트 반환
     return red_rows
 
 

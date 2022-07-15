@@ -107,7 +107,7 @@ def to_opera_df():
     try:
         xl_filename = 'opera_trial_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
-        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
+        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
             origin_df.to_excel(writer, sheet_name='original', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:

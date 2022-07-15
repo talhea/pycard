@@ -164,7 +164,7 @@ def to_bank_df():
     try:
         xl_filename = df_filename + '.xlsx'         # 저장파일 'df_bank_YYYYMMDD.xlsx'
         
-        with pnds.ExcelWriter(dfdata_dir + xl_filename) as writer:
+        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
             bank_df.to_excel(writer, sheet_name=f'{receipts_date}', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:
