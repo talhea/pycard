@@ -90,72 +90,86 @@ def merge_edi_opera():
     
     # 6. EDI 엑셀에 입력하기위한 카드 분류
     # 6-1. '카드분류' 컬럼 생성
-    card_history_df['카드분류'] = '분류'        # 'LT', 'KEB', 'JCB', 'VISA', 'MASTER', 'SA', 'SS', 'SH', 'BC', 'KB', 'HD', 'NH', 'CITI'
-
-    # 6-2. 'LT'
+    card_history_df['카드분류'] = '분류'
+    card_history_df['DESCR'] = '영문명'     # 'LT', 'KEB', 'JCB', 'VISA', 'MASTER', 'SA', 'SS', 'SH', 'BC', 'KB', 'HD', 'NH', 'CITI'
+    
+    # 'LT'
     condition = (card_history_df['매입카드사'].str.startswith('롯데', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9244'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'LT'
 
-    # 6-3. 'KEB'
+    # 'KEB'
     condition = (card_history_df['매입카드사'] == '하나구외환')  & (card_history_df['발급카드사'].str.startswith('하나', na=False) | card_history_df['발급카드사'].str.startswith('토스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9243'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'KEB'
 
-    # 6-4. 'JCB'
+    # 'JCB'
     condition = (card_history_df['발급카드사'].str.contains('제이씨비', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9235'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'JCB'
 
-    # 6-5. 'VISA'
+    # 'VISA'
     condition = (card_history_df['발급카드사'].str.contains('해외비자', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9231'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'VISA'
 
-    # 6-6. 'MASTER'
+    # 'MASTER'
     condition = (card_history_df['발급카드사'].str.contains('해외마스타', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9233'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'MASTER'
 
-    # 6-7. 'SA'
+    # 'SA'
     condition = (card_history_df['발급카드사'].str.contains('해외아멕스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9232'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'SA'
 
-    # 6-8. 'SS'
+    # 'SS'
     condition = (card_history_df['발급카드사'].str.startswith('삼성', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9239'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'SS'
 
-    # 6-9. 'SH'
+    # 'SH'
     condition = (card_history_df['매입카드사'].str.startswith('신한', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9242'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'SH'
 
-    # 6-10. 'BC'
+    # 'BC'
     condition = (card_history_df['매입카드사'].str.startswith('비씨', na=False))      # 'CITI'씨티카드와 중복되지만, 'CITI'는 마지막에 다시 셋팅
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9237'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'BC'
 
-    # 6-11. 'KB'
+    # 'KB'
     condition = (card_history_df['매입카드사'].str.startswith('국민', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9238'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'KB'
 
-    # 6-12. 'HD'
+    # 'HD'
     condition = (card_history_df['매입카드사'].str.startswith('현대', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9245'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'HD'
 
-    # 6-13. 'NH'
+    # 'NH'
     condition = (card_history_df['매입카드사'].str.startswith('NH', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9240'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'NH'
 
-    # 6-14. 'CITI'
+    # 'CITI'
     condition = (card_history_df['발급카드사'].str.startswith('씨티', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9241'
+    card_history_df.loc[collected_cards, 'DESCR'] = 'CITI'
     
     # 7. datframe 카드분류 컬럼에 따라서 해당 금액을 EDI 엑셀에 수식 문자열로 입력 (예, '=+50000+10000...')
     # 7-1. dataframe 코드별 금액을 mapping_code_edi의 'amounts'리스트에 추가
@@ -174,6 +188,7 @@ def merge_edi_opera():
     ws.title = str(yesterday.day)                   # sheet 이름 변경
     
     # 9. 파일 저장
+    # 9-1. EDI 엑셀 파일 저장
     target_dir = f'./data/{target_date}/'           # 날짜 폴더에 저장 '/data/YYYYMMDD/'
     
     try:
@@ -186,7 +201,41 @@ def merge_edi_opera():
             file.write(
                 f'[edi_opera.py - Making Data] <{datetime.datetime.now()}> openpyxl wirting error ({excel_filename}) ===> {e}\n'
             )
-        raise(e) 
+        raise(e)
+    
+    # 9-2. dataframe을 Excel로 저장, 기존 파일에 추가 sheet 형태로 저장
+    
+    #   카드별 건수와 합계 금액 dataframe 생성
+    #       pivot(또는 groupby)를 이용하여 grouping
+    grouped_df = pnds.pivot_table(card_history_df, index=['매입카드사', 'DESCR'], values=['금액'], aggfunc=['count', 'sum'], margins = True)
+    
+    #       다중 컬럼이므로 컬럼명 변경
+    grouped_df.columns = ['갯수:건수', '합계:금액']
+
+    #       행 순서를 EDI 엑셀파일 카드 순서대로 변경하기 위한 index 리셋
+    grouped_df.reset_index(inplace=True)
+
+    #       EDI 엑셀 파일의 카드 순서
+    ordered_card = {'LT': 1, 'KEB': 2, 'JCB': 3, 'VISA': 4, 'MASTER': 5, 'SA': 6, 'SS': 7, 'SH': 8, 'BC': 9, 'KB': 10, 'HD': 11, 'NH': 12, 'CITI': 13}
+
+    #       정렬을 위한 함수
+    def card_sort(series):
+        """ordered_card 리스트의 순서와 같이 정렬
+        반드시 series를 반환
+
+        Args:
+            series (_type_): 정렬용으로 사용될 값이 있는 series
+
+        Returns:
+            _type_: 인수로 들어온 series와 매칭되는 정열용 값을 가진 series
+        """        
+        return series.apply(lambda col: ordered_card.get(col, 100))
+
+    #       key에 셋팅된 함수는 반드시 series를 반환하도록 설계해야 함
+    grouped_df.sort_values(by='DESCR', key=card_sort, inplace=True)
+
+    #       다시 원래 형태의 group
+    grouped_df.set_index(['매입카드사', 'DESCR'], inplace=True)
 
 
 if __name__ == '__main__':
