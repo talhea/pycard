@@ -9,3 +9,5 @@
 [edi_opera.py - Reading Data] <2022-07-14 14:44:02.490885> openpyxl file-reading error (./EDI-7월.xlsx) ===> list index out of range
 [edi_opera.py - Reading Data] <2022-07-14 14:44:23.047046> openpyxl file-reading error (./EDI-7월.xlsx) ===> list index out of range
 [edi_opera.py - Reading Data] <2022-07-14 14:45:25.101929> openpyxl file-reading error (./EDI-7월.xlsx) ===> list index out of range
+[font_red_on_excel.py - Reading Data] <2022-07-15 08:41:47.161899> openpyxl file-reading error (./신용거래내역조회_220713.xlsx) ===> [Errno 2] No such file or directory: './신용거래내역조회_220713.xlsx'
+[font_red_on_excel.py - Reading Data] <2022-07-15 08:42:22.050653> openpyxl file-reading error (./신용거래내역조회_220713.xlsx) ===> [Errno 2] No such file or directory: './신용거래내역조회_220713.xlsx'

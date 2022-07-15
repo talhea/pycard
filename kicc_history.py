@@ -14,7 +14,7 @@ def to_card_history_df():
 
     # 1. 엑셀 파일을 읽어서 DataFrame 생성
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")      # 어제 날짜 포맷
-    # target_date = '20220710'
+    
     downdata_dir = f'./data/{target_date}/downdata/'                                        # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
     card_filename = downdata_dir + '신용거래내역조회.xlsx'                                  # KICC 카드 거래내역 엑셀파일
     
@@ -57,8 +57,8 @@ def to_card_history_df():
         card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_reds) == False]      # isin()결과가 False 인 것
     
     # 2-7. 필요한 컬럼만 추출
-    card_history_df = card_history_df[['거래고유번호', '승인구분', 'date', '승인번호',
-                                        '카드번호', '발급카드사', '매입카드사', '금액', '할부개월']]
+    card_history_df = card_history_df[['거래고유번호', '승인구분', 'date',
+                                        '카드번호', '발급카드사', '매입카드사', '금액', '할부개월', '승인번호']]
     
     # 2-8. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
