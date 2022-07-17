@@ -8,15 +8,15 @@ import pickle, os
 import datetime
 
 def to_receipts_history_df():
-    """다운로드 받은 KICC 입금 현황을 dataframe으로 저장한다
-    Pandas.read_excel함수로 읽어서 dataframe으로 만들고, 필요한 컬럼만 추출해서 dt디렉토리에 저장한다
+    """다운로드 받은 KICC 입금 현황을 Dataframe으로 저장한다
+    Pandas.read_excel함수로 읽어서 Dataframe으로 만들고, 필요한 컬럼만 추출해서 dfdata디렉토리에 저장한다
     """    
 
     # 1. 입금현황 엑셀 파일을 읽어서 DataFrame 생성
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     
     downdata_dir = f'./data/{target_date}/downdata/'                                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
-    receipts_filename = downdata_dir + '입금현황 · 일별.xlsx'                               # KICC 입금현황 엑셀파일
+    receipts_filename = downdata_dir + '입금현황 · 일별.xlsx'                           # KICC 입금현황 엑셀파일
     
     try:
         receipts_history_df = pnds.read_excel(receipts_filename, header=0, thousands = ',', # 금액 천단위 구분자 ',' 고려

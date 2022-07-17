@@ -43,7 +43,6 @@ def to_card_history_df():
     # 2-3. '승인번호' 중복 라인제거 == 당일 취소 건 제거
     card_history_df.drop_duplicates(subset=['승인번호'], keep=False, inplace=True)    # keep= 중복 라인들 모두 제거
     
-    
     # 2-4. '승인구분'이 '승인' 라인 추출
     card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
 
