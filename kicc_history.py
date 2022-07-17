@@ -53,7 +53,7 @@ def to_card_history_df():
     
     # 2-6. 이전(2일 전) 거래내역에 포함된 내역 제거
     del_reds = red_font.read_red_color()
-    if len(del_reds) != 0:
+    if len(del_reds) != 0:              # 이전 내역에 포함된 내역이 존재할 경우
         card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_reds) == False]      # isin()결과가 False 인 것
     
     # 2-7. 필요한 컬럼만 추출
@@ -93,11 +93,12 @@ def to_card_history_df():
             )
         raise(e)
     
-    # 3-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    # 3-3. dataframe 그대로 excel로 저장 => opera.py와 함께 이용
     try:
+        target_dir = f'./data/{target_dir}/'
         xl_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
-        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
+        with pnds.ExcelWriter(target_dir + xl_filename, mode='w', engine='openpyxl') as writer:
             card_history_df.to_excel(writer, sheet_name='original', index=False)
     except Exception as e:
         with open('./error.log', 'a') as file:

@@ -204,42 +204,42 @@ def merge_edi_opera():
             )
         raise(e)
     
-    # 10. grouping된 dataframe을 KICC 신용거래내역 엑셀파일에 추가로 저장
+    # 10. grouping된 dataframe을 기존 KICC 신용거래내역 엑셀파일에 추가로 저장
     # 10-1. 카드별 건수와 합계 금액 dataframe 생성: pivot(또는 groupby)를 이용하여 grouping
     grouped_df = pnds.pivot_table(card_history_df, index=['매입카드사', 'Description'], values=['금액'], aggfunc=['count', 'sum'], margins = True)
     
     # 10-2. 멀티 컬럼이므로 읽기 쉽도록 컬럼명 변경
     grouped_df.columns = ['갯수:건수', '합계:금액']
 
-    # 10-3. 행 순서를 EDI 엑셀파일 카드 순서대로 변경
-    grouped_df.reset_index(inplace=True)                # index를 리셋해서 멀티 인덱스 해제
-
-    ordered_card = {'LT': 1, 'KEB': 2, 'JCB': 3, 'VISA': 4, 'MASTER': 5, 'SA': 6,           # EDI 엑셀파일의 카드 순서를 나타내는 리스트
+    # 10-3. dataframe의 행 순서를 EDI 엑셀파일 카드 순서대로 변경
+    #       EDI 엑셀파일의 카드 순서를 나타내는 리스트와 이 리스트를 이용하는 정렬용 key 함수
+    ordered_card = {'LT': 1, 'KEB': 2, 'JCB': 3, 'VISA': 4, 'MASTER': 5, 'SA': 6,
                     'SS': 7, 'SH': 8, 'BC': 9, 'KB': 10, 'HD': 11, 'NH': 12, 'CITI': 13}
     
     def card_sort(series):
         """ordered_card 리스트를 이용하는 정렬용 key함수
-        인수로 전달된 카드 영문 단축명에 따라서, opdered_card의 value(정렬용 값)를 series로 반환
+        인수로 전달된 카드 영문 단축명에 따라서, opdered_card의 value(정렬용 값)을 series로 반환
 
         Args:
             series (str): 카드 영문 단축명 series('Description' 컬럼)
 
         Returns:
             series (int): 인수로 들어온 series와 매칭되는 정열용 값을 가진 series
-        """        
+        """
+
         return series.apply(lambda col: ordered_card.get(col, 100))
     
-    grouped_df.sort_values(by='Description', key=card_sort, inplace=True)       # key에 셋팅된 함수는 반드시 series를 반환하도록 설계해야 함
-
-    # 10-4. 원래의 grouping 형태대로 index 셋팅
-    grouped_df.set_index(['매입카드사', 'Description'], inplace=True)           # 다시 원래 형태의 group
+    #       멀티 인텍스를 임시로 해제하고 정렬 실시, 이후 원래대로 복구
+    grouped_df.reset_index(inplace=True)                                    # 먼저, dataframe의 index를 리셋해서 멀티 인덱스 해제
+    grouped_df.sort_values(by='Description', key=card_sort, inplace=True)   # key함수를 이용해서 정렬
+    grouped_df.set_index(['매입카드사', 'Description'], inplace=True)       # 다시 원래 형태의 grouping 형태대로 index 셋팅
     
-    # 10-5. kicc 카드거래내역 엑셀 파일에 추가로 저장
+    # 10-4. 기존의 KICC 카드거래내역 엑셀 파일에 추가 모드로 저장
     try:
         df_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'df_kicc_history_YYYYMMDD.xlsx
-        print(dfdata_dir + df_filename)
+        print(target_dir + df_filename)
 
-        with pnds.ExcelWriter(dfdata_dir + df_filename, mode='a', engine='openpyxl') as writer:     # 기존 파일 추가 mode 셋팅
+        with pnds.ExcelWriter(target_dir + df_filename, mode='a', engine='openpyxl') as writer:     # 기존 파일 추가 mode 셋팅
             grouped_df.to_excel(writer, sheet_name='groupped_calc', index=True)
     except Exception as e:
         with open('./error.log', 'a') as file:
