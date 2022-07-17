@@ -17,11 +17,11 @@ def to_opera_df():
     target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
     # 임시
     # target_date = '20220710'
-    dowmdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
+    downdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     
     try:
-        xtree = et.parse(dowmdata_dir + xml_filename)                   # ElementTree 객체로 읽어들임
+        xtree = et.parse(downdata_dir + xml_filename)                   # ElementTree 객체로 읽어들임
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
