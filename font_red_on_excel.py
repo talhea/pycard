@@ -3,8 +3,10 @@
 따라서 이 색이 셋팅된 row 들을 획득하여, 그 중 '거래고유번호'를 반환한다
 '''
 
+from csv import excel
 import openpyxl
 import datetime
+import os
 
 
 def read_red_color() -> list:
@@ -16,32 +18,31 @@ def read_red_color() -> list:
     Returns:
         list: {'거래고유번호' ...}
     """    
-    # 1. 2일 전 마감된 신용카드 거래 내역 파일 로딩
-    # 1-1. 날짜 와 파일명 셋팅
-    source_date = (datetime.datetime.now() - datetime.timedelta(2)).strftime("%y%m%d")  # 2일 전 날짜 포맷
+    # 1. 2일 전 마감된 신용카드 거래 내역 파일을 읽는다
+    source_date = (datetime.datetime.now() - datetime.timedelta(2)).strftime("%y%m%d")      # 저장된 '신용거래내역_YYMMDD'용 날짜 포맷, 2일 전 날짜
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
-    excel_filename = source_dir + f'신용거래내역조회_{source_date}.xlsx'                    # 2일 전 날짜의 '신용거래내역_YYMMDD.xlsx' 파일
+    excel_filename = source_dir + f'신용거래내역조회_{source_date}.xlsx'                    # 2일 전 신용거래내역조회 파일
     
-    # 1-2. excel 파일 로딩해서 ws 객체 셋팅
     try:
-        edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
-        ws = edi_excel[edi_excel.sheetnames[1]]                             # 두번쨰 shhet 선택
+        if os.path.exists(excel_filename):
+            edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
+            ws = edi_excel[edi_excel.sheetnames[1]]                             # 두번쨰 shhet 선택
+        else:
+            print('휴일인듯, 신용거래내역 없음')
+            return (list())
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
                 f'[font_red_on_excel.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
             )
         raise(e)
-    
-    # 2. for문을 통해 각 row의 font color를 판단 후 리스트 추출
+
     red_rows = []                           # 거래고유번호 리스트 
     for row in ws.iter_rows():              # row looping
         if row[0].font.color.rgb == 'FFFF0000':             # 해당 라인의 첫번쨰 셀의 font color가 red일 경우만.
             red_rows.append(row[0].value)                   # 해당 '거래고유번호'를 리스트에 추가
     
-    # 3. '거래고유번호' 리스트 반환
-    return red_rows
-
+    return red_rows                         # 리스트 반환
 
 if __name__ == '__main__':
     print(read_red_color())

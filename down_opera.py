@@ -16,8 +16,10 @@ def down():
     gui.click()
 
     # 이미 로그인 된 상태이므로 PMS 버튼 클릭: PMS 로그인 화면 로딩
-    gui.moveTo(750, 410)
-    gui.click()
+    # gui.moveTo(750, 410)
+    # gui.click()
+    # gui.sleep(8)
+    gui.click('./img/opera_pms.PNG')
     gui.sleep(8)
 
     # 로그인 창에서 로그인 클릭: PMS 화면 로딩

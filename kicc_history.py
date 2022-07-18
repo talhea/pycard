@@ -92,9 +92,10 @@ def to_card_history_df():
             )
         raise(e)
     
-    # 3-3. dataframe 그대로 excel로 저장 => opera.py와 함께 이용
+    print('=====')
+    # 3-3. dataframe 그대로 excel로 저장 => opera.py와 함께 이용        
     try:
-        target_dir = f'./data/{target_dir}/'
+        target_dir = f'./data/{target_date}/'
         xl_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'opera_trial_YYYYMMDD.xlsx
         
         with pnds.ExcelWriter(target_dir + xl_filename, mode='w', engine='openpyxl') as writer:
