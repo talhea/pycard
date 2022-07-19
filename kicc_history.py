@@ -7,13 +7,16 @@ import pickle, os
 import datetime
 import font_red_on_excel as red_font
 
-def to_card_history_df():
+def to_card_history_df(work_date):
     """다운로드 받은 KICC 신용카드 거래내역을 dataframe으로 저장한다
     xlsx 파일을 read_excel함수로 읽어들여 dataframe으로 만들고, 중복된 승인번호(당일 취소) 제거하고 날짜 포맷 셋팅 후 dataframe 으로 저장
+    
+    Args:
+        work_date (datetime): 어제 날짜
     """    
 
     # 1. 엑셀 파일을 읽어서 DataFrame 생성
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")      # 어제 날짜 포맷
+    target_date = work_date.strftime("%Y%m%d")      # 어제 날짜 포맷
     
     downdata_dir = f'./data/{target_date}/downdata/'                                        # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
     card_filename = downdata_dir + '신용거래내역조회.xlsx'                                  # KICC 카드 거래내역 엑셀파일
@@ -46,9 +49,10 @@ def to_card_history_df():
     # 2-4. '승인구분'이 '승인' 라인 추출
     card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
 
-    # 2-5. target_date 날짜만 추출
-    date_str = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")  # 어제 날짜 포맷
-    card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
+    # 일단, 오늘 날짜 내역도 보존하자.... 대신 처리는 edi_opera.py에서!!
+    # # 2-5. target_date 날짜만 추출
+    # date_str = work_date.strftime("%Y-%m-%d")  # 어제 날짜 포맷
+    # card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
     
     # 2-6. 이전(2일 전) 거래내역에 포함된 내역 제거
     del_reds = red_font.read_red_color()
@@ -92,7 +96,6 @@ def to_card_history_df():
             )
         raise(e)
     
-    print('=====')
     # 3-3. dataframe 그대로 excel로 저장 => opera.py와 함께 이용        
     try:
         target_dir = f'./data/{target_date}/'

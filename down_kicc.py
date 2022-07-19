@@ -7,8 +7,13 @@ import datetime
 import os, shutil
 import moving_to_folder as todown
 
-def down():
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+def down(work_date):
+    """KICC 카드거래내역과 입금현황내역 다운로드
+
+    Args:
+        work_date (datetime): 오늘 날짜
+    """    
+    target_date = work_date.strftime("%Y%m%d")  # 어제 날짜 포맷
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -43,6 +48,13 @@ def down():
     gui.scroll(55) # 클릭한번에 55 이동, 원래 위치로
     gui.sleep(6)
 
+    # 매출/입금 내역 날짜 셋팅 - 오늘
+    gui.click(710, 240)
+    gui.write(target_date, interval=0.4)
+    gui.sleep(1)
+    gui.write(target_date, interval=0.4)
+    gui.sleep(1)
+    
     # 매출/입금 내역 조회
     gui.moveTo(1514, 264)
     gui.click()
@@ -63,13 +75,21 @@ def down():
     gui.click()
     gui.sleep(1)
 
-    # from 거래일시 하루 전으로 셋팅
+    # from 어제 to 오늘까지 날짜 셋팅
     gui.moveTo(427, 239)
     gui.click()
     gui.sleep(1)
 
+    gui.write((work_date - datetime.timedelta(1)).strftime("%Y%m%d"), interval=0.4) # 어제 날ㅉ
+    gui.sleep(1)
+    
+    gui.moveTo(596, 239)
+    gui.click()
+    gui.sleep(1)
+    
     gui.write(target_date, interval=0.4)    # 결론적으로 어제부터 오늘까지 내역
     gui.sleep(1)
+    
 
     # 조회
     gui.moveTo(1516, 240)

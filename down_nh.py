@@ -5,8 +5,13 @@ import datetime
 import pyperclip
 import moving_to_folder as todown
 
-def down():
-    receips_date = datetime.datetime.now().strftime("%Y%m%d")                           # 오늘 입금 내역
+def down(work_date):
+    """NH(민국은행) 거래내역 다운로드
+
+    Args:
+        work_date (datetime): 오늘 날짜
+    """    
+    receips_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -68,6 +73,14 @@ def down():
     gui.click(630, 540)
     gui.sleep(1)
     gui.click(630, 590)
+    gui.sleep(1)
+
+    # 날짜 셋팅
+    gui.doubleClick(530, 635)
+    gui.write(receips_date, interval=0.4)
+    gui.sleep(1)
+    gui.doubleClick(760, 635)
+    gui.write(receips_date, interval=0.4)
     gui.sleep(1)
 
     # 조회버튼 클릭

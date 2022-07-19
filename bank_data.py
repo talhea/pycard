@@ -8,18 +8,21 @@ import pickle, os
 import datetime
 import re
 
-def to_bank_df():
+def to_bank_df(work_date):
     """다운로드 받은 기업은행, 농협(민국은행)의 입금 내역을 dataframe으로 저장한다
     첫째, 기업은행 입금 내역을 readlines함수로 한 줄씩 읽어, 각 줄을 '|' 구분자로 다시 분리한 후 dataframe으로 만들고 전처리 과정을 거친다.
     둘째, 농협(민국은행) 입금 내역을 BeautifulSoup 객체로 읽어들여, 
     세째, 두 데이터를 합쳐 저장한다
+    
+    Args:
+        work_date (datetime): 오늘 날짜
     """    
     # 1. 기업은행에서 '텍스트형식저장'한 내역을 읽고 dataframe을 만든다
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
-    receipts_date = datetime.datetime.now().strftime("%Y%m%d")                          # 입금 오늘 날짜
+    target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")            # 어제 날짜 포맷
+    receipts_date = work_date.strftime("%Y%m%d")                                    # 입금 오늘 날짜
     
-    downdata_dir = f'./data/{target_date}/downdata/'                                    # 읽어들일 down디렉토리 './data//YYYYMMDD/downdata/'
-    ibk_filename = '거래내역조회_입출식 예금' + receipts_date  + '.txt'                     # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
+    downdata_dir = f'./data/{target_date}/downdata/'                                # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
+    ibk_filename = '거래내역조회_입출식 예금' + receipts_date  + '.txt'                 # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
     try:
@@ -35,10 +38,12 @@ def to_bank_df():
     # 1-2. 리스트의 각 라인을 '|' 기준으로 분리해서 dataframe을 만든다
     lines = list(map(lambda line: line.strip().split('|'), lines))      # '\n' 제거하고 '|' 단위로 분해
     ibk_df = pnds.DataFrame(lines)                                      # DataFrame 생성
+    ibk_df.rename(columns=ibk_df.iloc[0], inplace=True)                 # 첫번쨰 행 컬럼으로 지정
+    ibk_df.drop(ibk_df.index[0], inplace=True)                          # 중복되는 첫번째 행 삭제
 
     # 2. 데이터 전처리
     # 2-1. 필요 컬럼 추출하고 컬럼명 변경
-    ibk_df = ibk_df[[1, 3, 5, 12]]                              # [거래일시, 입금, 거래내용, 상대계좌예금주명]
+    ibk_df = ibk_df[['거래일시', '입금', '거래내용', '상대계좌예금주명']]   # 필요한 컬럼 추출
     ibk_df.columns = ['date', 'receipts', 'details', 'holder']
 
     # 2-2. 금액 컬럼의 값에서 천단위 구분자 ','를 제외해서 int형으로 타입 변경
@@ -66,15 +71,16 @@ def to_bank_df():
     ibk_df = ibk_df[ibk_df['holder'].isin(['HD', 'LT', 'SS', 'SH', 'KEB', 'BC', 'KB'])]
 
     #------------------------------------------------------------------------------------------------------------------
-    # 기업은행 끝, 농협 시작
+    # 기업은행 끝, 농협 시작 : 'NH' 셋팅
     #------------------------------------------------------------------------------------------------------------------
 
     # 4. 농협의 xml 파일은 실제 내용은 html, 따라서 BeautifulSoup를 이용해서 읽어들임
     nh_filename = receipts_date + '.xls'                     # 읽을 파일 이름 'YYYYMMDD.xls'
     
+    #   BeautifulSoup 객체로 읽어들임
     try:
         with open(downdata_dir + nh_filename, 'rt', encoding='UTF-8') as page:
-            soup = BeautifulSoup(page, 'html.parser')                           # BeautifulSoup 객체로 읽어들임
+            soup = BeautifulSoup(page, 'html.parser')
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
@@ -84,11 +90,11 @@ def to_bank_df():
 
     # 5. dataframe 생성
     # 5-1. 내용 추출
-    content_soup = soup.select('td.se-td')      # 입출금내역을 beautifulsoup 객체로 읽어들임, 한 라인의 각 컬럼을 리스트 형식으로 저장
+    content_soup = soup.select('td.se-td')      # 입출금내역을 추출: 한 라인의 각 컬럼을 리스트 형식으로 저장
     row_lst = []                                # DataFrame 생성에 사용할 line buffer, 컬렴명이나 인텍스 없는 내용만 저장
     
     for content in content_soup:                # 각 컬럼을 looping
-        row_lst.append(re.sub('([0-9,]+) 원', '\\1', content.get_text().strip()))   # text 주변의 공백을 제거한 내용 추출
+        row_lst.append(re.sub('([0-9,]+) 원', '\\1', content.get_text().strip()))   # text 주변의 공백을 제거한 내용만 추출
 
     if len(content_soup) >= 5:                  # 입금 내역이 있을때만, 입금 내역이 있다면 최소한 5 이상의 길이(컬럼 수가 5개)가 나온다
         # 5-2. content 리스트를 dataframe으로 변환 ['날짜', '출금', '입금', '잔액', '적요']

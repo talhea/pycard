@@ -7,16 +7,19 @@ import pandas as pnds
 import pickle, os
 import datetime
 
-def to_receipts_history_df():
+def to_receipts_history_df(work_date):
     """다운로드 받은 KICC 입금 현황을 Dataframe으로 저장한다
     Pandas.read_excel함수로 읽어서 Dataframe으로 만들고, 필요한 컬럼만 추출해서 dfdata디렉토리에 저장한다
+    
+    Args:
+        work_date (datetime): 오늘 날짜
     """    
 
     # 1. 입금현황 엑셀 파일을 읽어서 DataFrame 생성
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")    # 어제 날짜 포맷
     
-    downdata_dir = f'./data/{target_date}/downdata/'                                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
-    receipts_filename = downdata_dir + '입금현황 · 일별.xlsx'                           # KICC 입금현황 엑셀파일
+    downdata_dir = f'./data/{target_date}/downdata/'                         # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
+    receipts_filename = downdata_dir + '입금현황 · 일별.xlsx'                   # KICC 입금현황 엑셀파일
     
     try:
         receipts_history_df = pnds.read_excel(receipts_filename, header=0, thousands = ',', # 금액 천단위 구분자 ',' 고려
@@ -53,8 +56,11 @@ def to_receipts_history_df():
         raise(e)
 
     # 4-2. dataframe 저장
+    #   입금내역의 저장 날짜는 오늘 날짜로
+    receipts_date = work_date.strftime("%Y%m%d")      # 오늘 날짜
+    
     try:
-        df_filename = 'dt_kicc_receips_' + target_date      # 저장할 dataframe 파일 이름 'dt_kicc_receipts_YYYYMMDD'
+        df_filename = 'dt_kicc_receips_' + receipts_date      # 저장할 dataframe 파일 이름 'dt_kicc_receipts_YYYYMMDD'
 
         with open(dfdata_dir + df_filename, "wb") as file:
             pickle.dump(receipts_history_df, file)
@@ -67,7 +73,7 @@ def to_receipts_history_df():
     
     # 4-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
     try:
-        xl_filename = 'df_kicc_receipts_' + target_date + '.xlsx'    # 저장파일 'df_kicc_receipts_YYYYMMDD.xlsx
+        xl_filename = 'df_kicc_receipts_' + receipts_date + '.xlsx'    # 저장파일 'df_kicc_receipts_YYYYMMDD.xlsx
         
         with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
             receipts_history_df.to_excel(writer, sheet_name='original', index=False)

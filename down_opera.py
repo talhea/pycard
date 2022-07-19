@@ -5,8 +5,13 @@ import datetime
 import os, shutil
 import moving_to_folder as todown
 
-def down():
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+def down(work_date):
+    """opera trial balance 다운로드
+
+    Args:
+        work_date (datetime): 어제 날짜
+    """    
+    target_date = work_date.strftime("%Y%m%d")  # 어제 날짜 포맷
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -56,6 +61,11 @@ def down():
 
     # OK버튼 핫키
     gui.hotkey("alt", "o")
+    
+    # 날짜 입력
+    gui.write(work_date.strftime('%d%m%Y'), interval=0.4)
+    gui.press('enter')
+    gui.sleep(1)
 
     # file 이름 변경
     gui.hotkey("alt", "f")
@@ -98,4 +108,4 @@ def down():
 
 
 if __name__ == '__main__':
-    down()
+    down((datetime.datetime.now() - datetime.timedelta(1)))

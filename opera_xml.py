@@ -7,14 +7,17 @@ import xml.etree.ElementTree as et
 import pickle, os
 import datetime
 
-def to_opera_df():
+def to_opera_df(work_date):
     """다운로드 받은 오페라 trial balance를 dataframe과 엑셀로 각 각 저장
     xml로 된 오페라 trial balance 파일을 xml.etree.ElementTree 객체로 읽어들여 dataframe으로 만든다.
     이 때의 원본은 따로 복사하여 추후에 엑셀 파일로 저장하고, 이후 필요한 컬름만 다시 추출하여 dataframe으로 저장한다
+    
+    Args:
+        work_date (datetime): 어제 날짜
     """    
 
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y%m%d")  # 어제 날짜 포맷
+    target_date = work_date.strftime("%Y%m%d")  # 어제 날짜 포맷
     # 임시
     # target_date = '20220710'
     downdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'

@@ -7,10 +7,15 @@ import shutil
 
 from nbformat import read
 
-def ready():
+def ready(work_date):
+    """어제 날짜로 된 디렉토리 생성
+
+    Args:
+        work_date (datetime): 어제 날짜
+    """
     # 0. 기존 error.log 백업
-    target_date = (datetime.datetime.now() - datetime.timedelta(1)).strftime('%Y%m%d')  # 어제 날짜 포맷
-    
+    target_date = work_date.strftime('%Y%m%d')  # 어제 날짜 포맷
+
     if os.path.isfile('./error.log'):
         shutil.move('./error.log', f'./error_{target_date}.log')
     

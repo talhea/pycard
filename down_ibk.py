@@ -6,8 +6,13 @@ import datetime
 import os, shutil
 import moving_to_folder as todown
 
-def down():
-    receips_date = datetime.datetime.now().strftime("%Y%m%d")                           # 오늘 입금 내역
+def down(work_date):
+    """IBK 기업은행 당일 거래 내역 출력
+
+    Args:
+        work_date (datetime): 오늘 날짜
+    """    
+    receips_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -99,7 +104,6 @@ def down():
     target_filename = '거래내역조회_입출식 예금' + receips_date + '.txt'    # 거래내역조회_입출식 예금YYYYMMDD.txt
 
     todown.to_downdata(down_base_dir, target_filename)                  # 신용거래내역: 어제날짜
-
 
 
 if __name__ == '__main__':

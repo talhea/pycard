@@ -6,10 +6,13 @@ import openpyxl
 import datetime
 import pickle, os
 
-def merge_edi_opera():
+def merge_edi_opera(work_date):
     """EDI 템플릿 엑셀 파일에 오페라 trial balance와 KICC 승인내역의 dataframe을 입력한다
     trial balance dataframe을 EDI 파일의 card 분류에 맞게 'book' 컬럼에 입력하고,
     kicc 신용거래내역 dataframe도 EDI 파일의 card 분류에 맞게 분류해서 'actual'컬럼에 입력한다.
+    
+    Args:
+        work_date (datetime): 어제 날짜
     """    
     
     # 1. EDI 템플릿 엑셀 파일을 로딩
@@ -49,17 +52,15 @@ def merge_edi_opera():
     #------------------------------------------------------------------------------------------------------------------
     
     # 3. 오페라 어제 마감된 trial report(df_trial_balance_날짜) dataframe 로딩
-    yesterday = datetime.datetime.now() - datetime.timedelta(1) # 어제 날짜 추출
-    target_date = yesterday.strftime("%Y%m%d")                  # 어제 날짜 포맷
-    # 임시
-    # target_date = '20220710'
+    target_date = work_date.strftime('%Y%m%d')                  # 어제 날짜 포맷
     
     dfdata_dir = f'./data/{target_date}/dfdata/'                # 읽어들일 dfdata디렉토리 './data/YYYYMMDD/dfdata/'
     opera_df_filename = 'df_opera_trial_' + target_date
     
+    #   Datafarame loading
     try:
         with open(dfdata_dir + opera_df_filename, "rb") as file:
-            opera_df = pickle.load(file)                        # dataframe loding
+            opera_df = pickle.load(file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
@@ -67,10 +68,9 @@ def merge_edi_opera():
             )
         raise(e)
     
-
     # 4. trial balance 내의 각 카드별 금액을 해당되는 EDI 엑셀에 입력(mapping_code_edi 참조)
     for code in opera_df.index:                                         # trx-code(index)를 이용해서 edi_ws와 opera_df에 접근하는 looping
-        edi_ws[mapping_code_edi[code]['book']] = opera_df.loc[code]['TB_AMOUNT'] * -1       # 오페라 dataframe으로부터 금액(tb_amount) 정보를 가져와, 
+        edi_ws[mapping_code_edi[code]['book']] = opera_df.loc[code, 'TB_AMOUNT'] * -1       # 오페라 dataframe으로부터 금액(tb_amount) 정보를 가져와, 
                                                                                             # 맵핑 딕셔너리에서 추출한 좌표를 이용해서 edi_ws(EDI엑셀)에 넣는다
     
     #------------------------------------------------------------------------------------------------------------------
@@ -79,10 +79,11 @@ def merge_edi_opera():
     
     # 5. KICC로부터 생성한 신용카드 승인내역 dataframe
     card_df_filename = 'df_kicc_history_' + target_date         # 파일 이름: df_kicc_history_YYYYMMDD
-
+    
+    #   KICC 카드 승인내역 Dataframe loading
     try:
         with open(dfdata_dir + card_df_filename, "rb") as file:
-            card_history_df = pickle.load(file)                 # dataframe loading
+            card_history_df = pickle.load(file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
@@ -90,8 +91,12 @@ def merge_edi_opera():
             )
         raise(e)
     
-    # 6. 각 카드 건들을 EDI 엑셀 파일의 카드 분류에따라 재분류
-    # 6-1. '카드분류' 컬럼과 그 영문 단축명인 'Description' 컬럼 생성
+    #   내일 날짜는 제외 - 추후 추가 처리 가능성
+    date_str = (work_date + datetime.timedelta(1)).strftime("%Y-%m-%d")                         # 내일 날짜 포맷
+    card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False) == False]
+    
+    # 6. 각 카드 내역들을 EDI 엑셀 파일의 카드 분류에따라 재분류
+    # 6-1. '카드분류'(card code) 컬럼과 그 영문 단축명인 'Description' 컬럼 생성
     card_history_df['카드분류'] = '분류'
     card_history_df['Description'] = '영문명'     # 'LT', 'KEB', 'JCB', 'VISA', 'MASTER', 'SA', 'SS', 'SH', 'BC', 'KB', 'HD', 'NH', 'CITI'
     
@@ -174,23 +179,21 @@ def merge_edi_opera():
     card_history_df.loc[collected_cards, 'Description'] = 'CITI'
     
     # 7. datframe 카드분류 컬럼에 따라 해당 금액을 EDI 엑셀에 수식 문자열로 입력 (예, '=+50000+10000...')
-    # 7-1. dataframe 코드별 금액을 mapping_code_edi의 'amounts'리스트에 추가
+    # 7-1. dataframe 각 금액을 code에따라 mapping_code_edi의 'amounts'리스트에 추가
     for index, row in card_history_df.iterrows():                   # dataframe row looping
-        mapping_code_edi[row['카드분류']]['amounts'].append(f"+{row['금액']}")  # 금액을 엑셀 수식 문자열로 저장
+        mapping_code_edi[row['카드분류']]['amounts'].append(f"+{row['금액']}")          # 금액을 엑셀 수식 문자열로 저장(예, '+50000+10000...')
     
     # 7-2. 위에서 입력된 'amounts' 금액리스트를 엑셀 서식 문자열로 edi 엑셀 파일에 저장
     for edi in mapping_code_edi.values():                   # EDI 매핑 정보의 값들을 looping
-        if len(edi['amounts']) != 0:                                # 해당 날짜의 카드 매출이 있는 것만
-            edi_ws[edi['actual']] = '=' + (''.join(edi['amounts']))             # 'amounts'를 엑셀 수식으로 결합해서 EDI엑셀의 'actual'좌표에 입력 (예, '=+50000+10000...')
+        if len(edi['amounts']) != 0:                                            # 해당 날짜의 카드 매출이 있는 것만
+            edi_ws[edi['actual']] = '=' + (''.join(edi['amounts']))             # 리스트를 엑셀 수식으로 타입으로 결합해서 EDI엑셀의 'actual'좌표에 입력 (예, '=+50000+10000...')
     
     # 8. 날짜 및 sheet명 셋팅
-    opera_date = yesterday.strftime('%b.%d.%Y')         # 오페라용 어제 날짜 포맷
-    edi_ws['B1'] = opera_date                           # EDI 엑셀파일 날짜 셋팅
-    
-    edi_ws.title = str(yesterday.day)                   # sheet 이름 변경
+    edi_ws['B1'] = work_date.strftime('%b.%d.%Y')       # EDI 엑셀파일 날짜 셋팅
+    edi_ws.title = str(work_date.day)                   # sheet 이름 변경
     
     # 9. EDI 엑셀 파일 저장
-    target_dir = f'./data/{target_date}/'           # 날짜 폴더에 저장 '/data/YYYYMMDD/'
+    target_dir = f'./data/{target_date}/'               # 날짜 폴더에 저장 '/data/YYYYMMDD/'
     
     try:
         excel_filename = 'EDI-' + target_date + '.xlsx' # 'EDI-YYYYMMDD.xlsx'
@@ -229,14 +232,14 @@ def merge_edi_opera():
 
         return series.apply(lambda col: ordered_card.get(col, 100))
     
-    #       멀티 인텍스를 임시로 해제하고 정렬 실시, 이후 원래대로 복구
+    #       정렬 작업 전후로, 멀티 인텍스를 임시로 해제 및 복구
     grouped_df.reset_index(inplace=True)                                    # 먼저, dataframe의 index를 리셋해서 멀티 인덱스 해제
     grouped_df.sort_values(by='Description', key=card_sort, inplace=True)   # key함수를 이용해서 정렬
     grouped_df.set_index(['매입카드사', 'Description'], inplace=True)       # 다시 원래 형태의 grouping 형태대로 index 셋팅
     
     # 10-4. 기존의 KICC 카드거래내역 엑셀 파일에 추가 모드로 저장
     try:
-        df_filename = 'df_kicc_history_' + target_date + '.xlsx'    # 저장파일 'df_kicc_history_YYYYMMDD.xlsx
+        df_filename = 'df_kicc_history_' + target_date + '.xlsx'            # 저장파일 'df_kicc_history_YYYYMMDD.xlsx
         print(target_dir + df_filename)
 
         with pnds.ExcelWriter(target_dir + df_filename, mode='a', engine='openpyxl') as writer:     # 기존 파일 추가 mode 셋팅
