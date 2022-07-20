@@ -40,3 +40,4 @@
 [kicc_history.py - Making Excel] <2022-07-17 09:45:06.270453> Pandas.ExcelWriter error (./df_kicc_history_20220710) ===> [Errno 13] Permission denied: './dfdata/20220710/df_kicc_history_20220710.xlsx'
 [kicc_history.py - Making Excel] <2022-07-17 09:46:15.195865> Pandas.ExcelWriter error (./df_kicc_history_20220710) ===> [Errno 13] Permission denied: './dfdata/20220710/df_kicc_history_20220710.xlsx'
 [kicc_history.py - Making Excel] <2022-07-17 09:46:23.001109> Pandas.ExcelWriter error (./df_kicc_history_20220710) ===> [Errno 13] Permission denied: './dfdata/20220710/df_kicc_history_20220710.xlsx'
+[kicc_history.py - Reading Data] <2022-07-20 15:43:56.896870> Pandas excel-reading error (./신용거래내역조회_220617.xlsx) ===> Unable to convert column 금액 to type int64

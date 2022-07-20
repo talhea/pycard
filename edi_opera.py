@@ -18,9 +18,10 @@ def merge_edi_opera(work_date):
     # 1. EDI 템플릿 엑셀 파일을 로딩
     excel_filename = './EDI-xx월.xlsx'                                      # EDI 엑셀 템플릿 파일
     
+    # 수식 포함하여 엑셀 파일 로딩
     try:
-        edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
-        edi_ws = edi_excel.active                                               # 활성화된 sheet
+        edi_excel = openpyxl.load_workbook(excel_filename, data_only=False)
+        edi_ws = edi_excel.active                                           # 활성화된 sheet
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(

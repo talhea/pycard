@@ -80,7 +80,7 @@ def down(work_date):
     gui.click()
     gui.sleep(1)
 
-    gui.write((work_date - datetime.timedelta(1)).strftime("%Y%m%d"), interval=0.4) # 어제 날ㅉ
+    gui.write((work_date - datetime.timedelta(1)).strftime("%Y%m%d"), interval=0.4) # 어제 날짜
     gui.sleep(1)
     
     gui.moveTo(596, 239)

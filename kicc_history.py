@@ -5,7 +5,7 @@
 import pandas as pnds
 import pickle, os
 import datetime
-import font_red_on_excel as red_font
+import tomorrow_history
 
 def to_card_history_df(work_date):
     """다운로드 받은 KICC 신용카드 거래내역을 dataframe으로 저장한다
@@ -16,17 +16,18 @@ def to_card_history_df(work_date):
     """    
 
     # 1. 엑셀 파일을 읽어서 DataFrame 생성
-    target_date = work_date.strftime("%Y%m%d")      # 어제 날짜 포맷
+    target_date = work_date.strftime("%Y%m%d")                          # 어제 날짜 포맷
     
-    downdata_dir = f'./data/{target_date}/downdata/'                                        # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
-    card_filename = downdata_dir + '신용거래내역조회.xlsx'                                  # KICC 카드 거래내역 엑셀파일
+    downdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
+    card_filename = downdata_dir + '신용거래내역조회.xlsx'                  # KICC 카드 거래내역 엑셀파일
     
+    # pandas 엑셀 파일 로딩
     try:
         card_history_df = pnds.read_excel(
-                                        card_filename, header=0, thousands = ',',           # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
-                                        dtype={'거래고유번호': str,                         # 너무 큰 숫자들이므로 문자열로 셋팅
+                                        card_filename, header=0, thousands = ',',       # 첫번쨰 라인은 컬럼명(header), 금액 천단위 구분자 ',' 고려
+                                        dtype={'거래고유번호': str,                     # 너무 큰 숫자들이므로 문자열로 셋팅
                                                 '금액': 'int64',
-                                                '승인번호': str},                           # 영문이나 숫자 '0'도 표시되어야 함으로 문자열 타입
+                                                '승인번호': str},                       # 영문이나 숫자 '0'도 표시되어야 함으로 str 타입으로!
                                         na_values=None
                                         )
     except Exception as e:
@@ -48,26 +49,21 @@ def to_card_history_df(work_date):
     
     # 2-4. '승인구분'이 '승인' 라인 추출
     card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
-
-    # 일단, 오늘 날짜 내역도 보존하자.... 대신 처리는 edi_opera.py에서!!
-    # # 2-5. target_date 날짜만 추출
-    # date_str = work_date.strftime("%Y-%m-%d")  # 어제 날짜 포맷
-    # card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False)]
     
-    # 2-6. 이전(2일 전) 거래내역에 포함된 내역 제거
-    del_reds = red_font.read_red_color()
-    if len(del_reds) != 0:              # 이전 내역에 포함된 내역이 존재할 경우
-        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_reds) == False]      # isin()결과가 False 인 것
+    # 2-5. 이전(2일 전) 거래내역 중, 이미 등록된 어제 날짜 내역 제거
+    del_serial_nums = tomorrow_history.get_serial_number(work_date)
+    if len(del_serial_nums) != 0:                                           # 이전 내역에 포함된 내역이 있을 경우
+        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_serial_nums) == False]      # isin()결과가 False 인 것만 추출
     
-    # 2-7. 필요한 컬럼만 추출
+    # 2-6. 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date',
                                         '카드번호', '발급카드사', '매입카드사', '금액', '할부개월', '승인번호']]
     
-    # 2-8. date 기준 sorting
+    # 2-7. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # 2-9. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
-    card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
+    # # 2-8. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
+    # card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. df디렉토리에 dataframe 저장
     # 3-1. 목적지 df디렉토리 확인하고 없으면 생성
