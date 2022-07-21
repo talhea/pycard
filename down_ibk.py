@@ -12,7 +12,7 @@ def down(work_date):
     Args:
         work_date (datetime): 오늘 날짜
     """    
-    receips_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
+    receipts_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -55,6 +55,24 @@ def down(work_date):
     gui.moveTo(714, 553)
     gui.click()
 
+    # 날짜 셋팅
+    gui.click(620, 625)
+    gui.write(str(work_date.year))
+    gui.press('tab')
+    gui.press('tab')
+    gui.write(str(work_date.month))
+    gui.press('tab')
+    gui.write(str(work_date.day))
+    
+    gui.click(880, 625)
+    gui.write(str(work_date.year))
+    gui.press('tab')
+    gui.press('tab')
+    gui.write(str(work_date.month))
+    gui.press('tab')
+    gui.write(str(work_date.day))
+    
+
     # 조회버튼 클릭
     gui.moveTo(912, 714)
     gui.click()
@@ -75,7 +93,7 @@ def down(work_date):
     gui.sleep(3)
 
     # 다운로드 결과창 끄기
-    gui.moveTo(1579, 832)
+    gui.moveTo(1579, 840)
     gui.click()
 
     # 파일 창 끄기
@@ -100,11 +118,19 @@ def down(work_date):
 
 
     # 다운로드 받는 파일을 downdata디렉토리로 이동
-    down_base_dir = 'C:/Users/FA2/Downloads/'                           # 파일이 다운로드된 디렉토리
-    target_filename = '거래내역조회_입출식 예금' + receips_date + '.txt'    # 거래내역조회_입출식 예금YYYYMMDD.txt
+    down_base_dir = 'C:/Users/FA2/Downloads/'                                               # 파일이 다운로드된 디렉토리
+    
+    #   source 파일명 : 당 일 입금 내역의 조회가 아니라면, 실제 내역의 날짜와는 달리 오늘 날짜로 저장되므로 이를 보정(receipts_date을 사용하지 않는 이유)
+    source_filename = '거래내역조회_입출식 예금' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'  # 오늘 날짜로 된 source 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
+    
+    #   목적지 위치: 인수로 들어온 날짜는... 폴더 이름은 하루 전 날짜로, 파일 이름은 날짜 그대로(당일 날짜) 셋팅
+    target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")                    # 폴더 이름용 어제 날짜 포맷
+    target_dir = f'./data/{target_date}/downdata/거래내역조회_입출식 예금{receipts_date}.txt' # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
+                                                                                            # 목적지 : './data/YYYYMMDD/downdata/거래내역조회_입출식 예금YYYYMMDD.txt'
+    
+    #   파일 옮기기
+    todown.to_downdata(down_base_dir + source_filename, target_dir)
 
-    todown.to_downdata(down_base_dir, target_filename)                  # 신용거래내역: 어제날짜
 
-
-if __name__ == '__main__':
-    down()
+# if __name__ == '__main__':
+#     down()

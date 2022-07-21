@@ -1,7 +1,7 @@
 # 기업은행 입금내역(오늘 기준)를 내여받는다
 
 import pyautogui as gui
-import datetime
+import datetime, os
 import pyperclip
 import moving_to_folder as todown
 
@@ -11,7 +11,7 @@ def down(work_date):
     Args:
         work_date (datetime): 오늘 날짜
     """    
-    receips_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
+    receipts_date = work_date.strftime("%Y%m%d")                           # 오늘 입금 내역
     
     gui.PAUSE = 0.5
     gui.sleep(3)
@@ -77,10 +77,10 @@ def down(work_date):
 
     # 날짜 셋팅
     gui.doubleClick(530, 635)
-    gui.write(receips_date, interval=0.4)
+    gui.write(receipts_date, interval=0.4)
     gui.sleep(1)
     gui.doubleClick(760, 635)
-    gui.write(receips_date, interval=0.4)
+    gui.write(receipts_date, interval=0.4)
     gui.sleep(1)
 
     # 조회버튼 클릭
@@ -116,11 +116,19 @@ def down(work_date):
     gui.sleep(2)
 
 
-    # 다운로드 받는 파일을 down디렉토리로 이동
-    down_base_dir = 'C:/Users/FA2/Downloads/'           # 파일이 다운로드된 디렉토리
-    target_filename = receips_date + '.xls'             # 오늘 날짜로 된 입금내역 'YYYYMMDD.xls'
+    # 다운로드 받는 파일을 downdata디렉토리로 이동
+    down_base_dir = 'C:/Users/FA2/Downloads/'                                   # 다운로드된 파일이 있는 디렉토리
 
-    todown.to_downdata(down_base_dir, target_filename)  # 파일 이동
+    #   source 파일명 : 당 일 입금 내역의 조회가 아니라면, 실제 내역의 날짜와는 달리 오늘 날짜로 저장되므로 이를 보정(receipts_date을 사용하지 않는 이유)
+    source_filename = datetime.datetime.now().strftime('%Y%m%d') + '.xls'       # 오늘 날짜로 된 source 파일 이름 'YYYYMMDD.xls'
+    
+    #   목적지 위치: 인수로 들어온 날짜는... 폴더 이름은 하루 전 날짜로, 파일 이름은 날짜 그대로(당일 날짜) 셋팅
+    target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")        # 폴더 이름용 어제 날짜 포맷
+    target_dir = f'./data/{target_date}/downdata/{receipts_date}.xls'           # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
+                                                                                # 목적지 : './data/YYYYMMDD/downdata/YYYYMMDD.xls'
+    
+    #   파일 옮기기
+    todown.to_downdata(down_base_dir + source_filename, target_dir)
 
 
 if __name__ == '__main__':

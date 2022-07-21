@@ -10,7 +10,7 @@ import datetime
 import os
 
 
-def get_serial_string(work_date) -> list:
+def get_serial_number(work_date) -> list:
     """신용거래내역에서 font가 빨간 라인의 '거래고유번호' 리스트를 반환한다
     '거래고유번호'는 당 일(day)을 기준으로 번호가 시작된다
     '거래고유번호'는 당 일(day)을 기준으로 번호가 시작된다
@@ -28,8 +28,8 @@ def get_serial_string(work_date) -> list:
     
     try:
         if os.path.exists(source_dir + excel_filename):                     # 2일 전 신용거래내역조회 파일이 있을 경우
-            edi_excel = openpyxl.load_workbook(excel_filename, data_only=False) # 수식파일 포함하여 엑셀파일 읽어 들임
-            ws = edi_excel[edi_excel.sheetnames[1]]                             # 두번쨰 sheet 선택
+            edi_excel = openpyxl.load_workbook(source_dir + excel_filename, data_only=False)    # 수식파일 포함하여 엑셀파일 읽어 들임
+            ws = edi_excel[edi_excel.sheetnames[1]]                                             # 두번쨰 sheet 선택
         else:
             print('read_red_coloe.py : 휴일인듯, 신용거래내역 없음')
             return (list())

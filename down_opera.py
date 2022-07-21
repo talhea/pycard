@@ -21,11 +21,10 @@ def down(work_date):
     gui.click()
 
     # 이미 로그인 된 상태이므로 PMS 버튼 클릭: PMS 로그인 화면 로딩
-    # gui.moveTo(750, 410)
-    # gui.click()
-    # gui.sleep(8)
-    gui.click('./img/opera_pms.PNG')
+    gui.moveTo(740, 380)
+    gui.click()
     gui.sleep(8)
+
 
     # 로그인 창에서 로그인 클릭: PMS 화면 로딩
     gui.moveTo(888, 595)
@@ -74,8 +73,8 @@ def down(work_date):
     gui.doubleClick()
     gui.sleep(1)
 
-    target_filename = "trial_balance" + target_date     # trial_balance20220701
-    gui.write(target_filename, interval=0.4)
+    source_filename = "trial_balance" + target_date     # trial_balance20220701
+    gui.write(source_filename, interval=0.4)
     gui.sleep(2)
 
     gui.moveTo(1005, 547)
@@ -100,12 +99,19 @@ def down(work_date):
 
     gui.sleep(3)
 
-    # 다운로드 받는 파일을 down디렉토리로 이동
-    down_base_dir = 'C:/Users/FA2/'         # 파일이 다운로드된 디렉토리
-    target_filename += '.xml'               # 파일 trial_balanceYYYYMMDD.xml     
+    # 다운로드 받는 파일을 downdata디렉토리로 이동
+    down_base_dir = 'C:/Users/FA2/'             # 파일이 다운로드된 디렉토리
+    
+    #   source 파일명 
+    source_filename += '.xml'                   # 다운로드 받은 source 파일 이름 'trial_balanceYYYYMMDD.xml'
+    
+    #   목적지 위치: 오페라의 경우는... 인수로 들어온 날짜가 폴더와 파일 이름 모두 날짜 그대로(하루 전 날짜) 셋팅
+    target_dir = f'./data/{target_date}/downdata/trial_balance{target_date}.xml'    # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
+                                                                                    # 목적지 : './data/YYYYMMDD/downdata/trial_balanceYYYYMMDD.xml'
+    
+    #   파일 옮기기
+    todown.to_downdata(down_base_dir + source_filename, target_dir)
 
-    todown.to_downdata(down_base_dir, target_filename) # 파일 이동
 
-
-if __name__ == '__main__':
-    down((datetime.datetime.now() - datetime.timedelta(1)))
+# if __name__ == '__main__':
+#     down((datetime.datetime.now() - datetime.timedelta(1)))
