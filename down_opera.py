@@ -106,8 +106,7 @@ def down(work_date):
     source_filename += '.xml'                   # 다운로드 받은 source 파일 이름 'trial_balanceYYYYMMDD.xml'
     
     #   목적지 위치: 오페라의 경우는... 인수로 들어온 날짜가 폴더와 파일 이름 모두 날짜 그대로(하루 전 날짜) 셋팅
-    target_dir = f'./data/{target_date}/downdata/trial_balance{target_date}.xml'    # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
-                                                                                    # 목적지 : './data/YYYYMMDD/downdata/trial_balanceYYYYMMDD.xml'
+    target_dir = f'./data/{target_date}/downdata/trial_balance{target_date}.xml'    # 목적지 : './data/YYYYMMDD/downdata/trial_balanceYYYYMMDD.xml'
     
     #   파일 옮기기
     todown.to_downdata(down_base_dir + source_filename, target_dir)

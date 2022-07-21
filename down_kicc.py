@@ -133,10 +133,10 @@ def down(work_date):
     target_dir = f'./data/{target_date}/downdata/'          # './data/YYYYMMDD/downdata'
     
     target_filename = '입금현황 · 일별.xlsx'                # 입금파일(오늘날짜)
-    todown.to_downdata(down_base_dir + target_filename, target_dir + target_filename)     # 파일 이동
+    todown.to_downdata(down_base_dir + target_filename, target_dir + target_filename)       # 파일 이동
 
     target_filename = '신용거래내역조회.xlsx'               # 신용거래내역(어제날짜)
-    todown.to_downdata(down_base_dir + target_filename, target_dir + target_filename)      # 파일 이동
+    todown.to_downdata(down_base_dir + target_filename, target_dir + target_filename)       # 파일 이동
 
 
 # if __name__ == '__main__':
