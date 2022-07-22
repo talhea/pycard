@@ -86,4 +86,4 @@ def to_receipts_history_df(work_date):
 
 
 if __name__ == '__main__':
-    to_receipts_history_df()
+    to_receipts_history_df(datetime.datetime.now())

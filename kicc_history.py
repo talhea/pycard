@@ -102,4 +102,4 @@ def to_card_history_df(work_date):
 
 
 if __name__ == '__main__':
-    to_card_history_df()
+    to_card_history_df(datetime.datetime.now() - datetime.timedelta(1))

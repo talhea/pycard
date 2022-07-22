@@ -112,5 +112,5 @@ def down(work_date):
     todown.to_downdata(down_base_dir + source_filename, target_dir)
 
 
-# if __name__ == '__main__':
-#     down((datetime.datetime.now() - datetime.timedelta(1)))
+if __name__ == '__main__':
+    down((datetime.datetime.now() - datetime.timedelta(1)))

@@ -180,4 +180,4 @@ def to_bank_df(work_date):
         raise(e)
 
 if __name__ == '__main__':
-    to_bank_df()
+    to_bank_df(datetime.datetime.now())

@@ -139,5 +139,5 @@ def down(work_date):
     todown.to_downdata(down_base_dir + target_filename, target_dir + target_filename)       # 파일 이동
 
 
-# if __name__ == '__main__':
-#     down()
+if __name__ == '__main__':
+    down(datetime.datetime.now())

@@ -48,5 +48,6 @@ def get_dup_serials(work_date) -> list:
     
     return red_rows                         # 리스트 반환
 
-# if __name__ == '__main__':
-#     print(read_red_color())
+
+if __name__ == '__main__':
+    print(get_dup_serials(datetime.datetime.now() - datetime.timedelta(1)))

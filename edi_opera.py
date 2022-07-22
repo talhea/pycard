@@ -262,4 +262,4 @@ def merge_edi_opera(work_date):
 
 
 if __name__ == '__main__':
-    merge_edi_opera()
+    merge_edi_opera(datetime.datetime.now() - datetime.timedelta(1))

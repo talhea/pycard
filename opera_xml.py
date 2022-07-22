@@ -121,4 +121,4 @@ def to_opera_df(work_date):
 
 
 if __name__ == '__main__':
-    to_opera_df()
+    to_opera_df(datetime.datetime.now() - datetime.timedelta(1))

@@ -130,20 +130,20 @@ def down(work_date):
     gui.sleep(2)
 
 
-    # # 다운로드 받는 파일을 downdata디렉토리로 이동
-    # down_base_dir = 'C:/Users/FA2/Downloads/'                                               # 파일이 다운로드된 디렉토리
+    # 다운로드 받는 파일을 downdata디렉토리로 이동
+    down_base_dir = 'C:/Users/FA2/Downloads/'                                               # 파일이 다운로드된 디렉토리
     
-    # #   source 파일명 : 당 일 입금 내역의 조회가 아니라면, 실제 내역의 날짜와는 달리 오늘 날짜로 저장되므로 이를 보정(receipts_date을 사용하지 않는 이유)
-    # source_filename = '거래내역조회_입출식 예금' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'  # 오늘 날짜로 된 source 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
+    #   source 파일명 : 당 일 입금 내역의 조회가 아니라면, 실제 내역의 날짜와는 달리 오늘 날짜로 저장되므로 이를 보정(receipts_date을 사용하지 않는 이유)
+    source_filename = '거래내역조회_입출식 예금' + datetime.datetime.now().strftime('%Y%m%d') + '.txt'  # 오늘 날짜로 된 source 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
     
-    # #   목적지 위치: 인수로 들어온 날짜는... 폴더 이름은 하루 전 날짜로, 파일 이름은 날짜 그대로(당일 날짜) 셋팅
-    # target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")                    # 폴더 이름용 어제 날짜 포맷
-    # target_dir = f'./data/{target_date}/downdata/거래내역조회_입출식 예금{receipts_date}.txt' # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
-    #                                                                                         # 목적지 : './data/YYYYMMDD/downdata/거래내역조회_입출식 예금YYYYMMDD.txt'
+    #   목적지 위치: 인수로 들어온 날짜는... 폴더 이름은 하루 전 날짜로, 파일 이름은 날짜 그대로(당일 날짜) 셋팅
+    target_date = (work_date - datetime.timedelta(1)).strftime("%Y%m%d")                    # 폴더 이름용 어제 날짜 포맷
+    target_dir = f'./data/{target_date}/downdata/거래내역조회_입출식 예금{receipts_date}.txt' # 당일 처리 내역이 아닐 경우를 위해서 파일명 지정(변경)
+                                                                                            # 목적지 : './data/YYYYMMDD/downdata/거래내역조회_입출식 예금YYYYMMDD.txt'
     
-    # #   파일 옮기기
-    # todown.to_downdata(down_base_dir + source_filename, target_dir)
+    #   파일 옮기기
+    todown.to_downdata(down_base_dir + source_filename, target_dir)
 
 
-# if __name__ == '__main__':
-#     down()
+if __name__ == '__main__':
+    down(datetime.datetime.now())
