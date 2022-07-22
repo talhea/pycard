@@ -10,7 +10,7 @@ import datetime
 import os
 
 
-def get_serial_number(work_date) -> list:
+def get_dup_serial(work_date) -> list:
     """이전(인수 날짜의 하루 전)의 거래내역에서 인수로 들어온 날(당일)로 된 '거래고유번호' 리스트를 반환한다
     '거래고유번호'는 당 일(day)을 기준으로 번호가 시작되므로, 이를 이용해서 당 일의 거래 내역을 추출한다
     

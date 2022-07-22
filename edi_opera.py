@@ -6,6 +6,7 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 import datetime
 import pickle, os
+import tomorrow_history
 
 def merge_edi_opera(work_date):
     """EDI 템플릿 엑셀 파일에 오페라 trial balance와 KICC 승인내역의 dataframe을 입력한다
@@ -93,8 +94,13 @@ def merge_edi_opera(work_date):
             )
         raise(e)
     
-    #   내일 날짜는 제외 - 추후 추가 처리 가능성
-    date_str = (work_date + datetime.timedelta(1)).strftime("%Y-%m-%d")                         # 내일 날짜 포맷
+    #   이전(2일 전) 거래내역 중, 이미 등록된 어제 날짜 내역 제거
+    del_dup_serials = tomorrow_history.get_dup_serial(work_date)
+    if len(del_dup_serials) != 0:                                           # 이전 내역에 포함된 내역이 있을 경우
+        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_dup_serials) == False]   # isin()결과가 False 인 것만 추출
+    
+    #   내일 날짜는 제외 - 일단 제외하고....
+    date_str = (work_date + datetime.timedelta(1)).strftime("%Y-%m-%d")                                     # 내일 날짜 포맷
     card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False) == False]
     
     # 6. 각 카드 내역들을 EDI 엑셀 파일의 카드 분류에따라 재분류

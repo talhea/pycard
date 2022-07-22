@@ -5,7 +5,6 @@
 import pandas as pnds
 import pickle, os
 import datetime
-import tomorrow_history
 
 def to_card_history_df(work_date):
     """다운로드 받은 KICC 신용카드 거래내역을 dataframe으로 저장한다
@@ -50,16 +49,11 @@ def to_card_history_df(work_date):
     # 2-4. '승인구분'이 '승인' 라인 추출
     card_history_df = card_history_df[card_history_df['승인구분'] == '승인']
     
-    # 2-5. 이전(2일 전) 거래내역 중, 이미 등록된 어제 날짜 내역 제거
-    del_serial_nums = tomorrow_history.get_serial_number(work_date)
-    if len(del_serial_nums) != 0:                                           # 이전 내역에 포함된 내역이 있을 경우
-        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_serial_nums) == False]      # isin()결과가 False 인 것만 추출
-    
-    # 2-6. 필요한 컬럼만 추출
+    # 2-5. 필요한 컬럼만 추출
     card_history_df = card_history_df[['거래고유번호', '승인구분', 'date',
                                         '카드번호', '발급카드사', '매입카드사', '금액', '할부개월', '승인번호']]
     
-    # 2-7. date 기준 sorting
+    # 2-6. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
     # # 2-8. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
