@@ -95,7 +95,7 @@ def merge_edi_opera(work_date):
         raise(e)
     
     #   이전(2일 전) 거래내역 중, 이미 등록된 어제 날짜 내역 제거
-    del_dup_serials = tomorrow_history.get_dup_serial(work_date)
+    del_dup_serials = tomorrow_history.get_dup_serials(work_date)
     if len(del_dup_serials) != 0:                                           # 이전 내역에 포함된 내역이 있을 경우
         card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_dup_serials) == False]   # isin()결과가 False 인 것만 추출
     
