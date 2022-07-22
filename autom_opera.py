@@ -9,6 +9,12 @@ import preparation
 today = datetime.datetime.now()
 yesterday = today - datetime.timedelta(1)
 
+def get_date():
+    today = datetime.datetime.now()
+    yesterday = today - datetime.timedelta(1)
+
+schedule.every().day.at("06:50").do(get_date)
+
 # preparation.ready(yesterday)
 schedule.every().day.at("07:00").do(preparation.ready, yesterday)
 

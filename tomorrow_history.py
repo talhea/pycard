@@ -11,9 +11,8 @@ import os
 
 
 def get_serial_number(work_date) -> list:
-    """신용거래내역에서 font가 빨간 라인의 '거래고유번호' 리스트를 반환한다
-    '거래고유번호'는 당 일(day)을 기준으로 번호가 시작된다
-    '거래고유번호'는 당 일(day)을 기준으로 번호가 시작된다
+    """이전(인수 날짜의 하루 전)의 거래내역에서 인수로 들어온 날(당일)로 된 '거래고유번호' 리스트를 반환한다
+    '거래고유번호'는 당 일(day)을 기준으로 번호가 시작되므로, 이를 이용해서 당 일의 거래 내역을 추출한다
     
     Args:
         work_date (datetime): 어제 날짜
@@ -31,12 +30,12 @@ def get_serial_number(work_date) -> list:
             edi_excel = openpyxl.load_workbook(source_dir + excel_filename, data_only=False)    # 수식파일 포함하여 엑셀파일 읽어 들임
             ws = edi_excel[edi_excel.sheetnames[1]]                                             # 두번쨰 sheet 선택
         else:
-            print('read_red_coloe.py : 휴일인듯, 신용거래내역 없음')
+            print('tomorrow_history.py : 휴일인듯, 신용거래내역 없음')
             return (list())
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[font_red_on_excel.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
+                f'[tomorrow_history.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
             )
         raise(e)
 
@@ -49,5 +48,5 @@ def get_serial_number(work_date) -> list:
     
     return red_rows                         # 리스트 반환
 
-if __name__ == '__main__':
-    print(read_red_color())
+# if __name__ == '__main__':
+#     print(read_red_color())

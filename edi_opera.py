@@ -3,6 +3,7 @@
 '''
 import pandas as pnds
 import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
 import datetime
 import pickle, os
 
@@ -56,16 +57,16 @@ def merge_edi_opera(work_date):
     target_date = work_date.strftime('%Y%m%d')                  # 어제 날짜 포맷
     
     dfdata_dir = f'./data/{target_date}/dfdata/'                # 읽어들일 dfdata디렉토리 './data/YYYYMMDD/dfdata/'
-    opera_df_filename = 'df_opera_trial_' + target_date
+    opera_xl_filename = 'df_opera_trial_' + target_date
     
     #   Datafarame loading
     try:
-        with open(dfdata_dir + opera_df_filename, "rb") as file:
+        with open(dfdata_dir + opera_xl_filename, "rb") as file:
             opera_df = pickle.load(file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({opera_df_filename}) ===> {e}\n'
+                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({opera_xl_filename}) ===> {e}\n'
             )
         raise(e)
     
@@ -75,20 +76,20 @@ def merge_edi_opera(work_date):
                                                                                             # 맵핑 딕셔너리에서 추출한 좌표를 이용해서 edi_ws(EDI엑셀)에 넣는다
     
     #------------------------------------------------------------------------------------------------------------------
-    # KICC 신용카드 승인내역의 각 금액을 카드별로 분류하여 EDI 엑셀 'Actual' 컬럼에 입력
+    # KICC 신용카드 승인내역의 각 금액을 카드별로 분류하여 EDI 엑셀 'Actual'에 입력
     #------------------------------------------------------------------------------------------------------------------
     
     # 5. KICC로부터 생성한 신용카드 승인내역 dataframe
-    card_df_filename = 'df_kicc_history_' + target_date         # 파일 이름: df_kicc_history_YYYYMMDD
+    card_xl_filename = 'df_kicc_history_' + target_date         # 파일 이름: df_kicc_history_YYYYMMDD
     
     #   KICC 카드 승인내역 Dataframe loading
     try:
-        with open(dfdata_dir + card_df_filename, "rb") as file:
+        with open(dfdata_dir + card_xl_filename, "rb") as file:
             card_history_df = pickle.load(file)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({card_df_filename}) ===> {e}\n'
+                f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({card_xl_filename}) ===> {e}\n'
             )
         raise(e)
     
@@ -212,6 +213,7 @@ def merge_edi_opera(work_date):
     # 10-1. 카드별 건수와 합계 금액 dataframe 생성: pivot(또는 groupby)를 이용하여 grouping
     grouped_df = pnds.pivot_table(card_history_df, index=['매입카드사', 'Description'], values=['금액'], aggfunc=['count', 'sum'], margins = True)
     
+    
     # 10-2. 멀티 컬럼이므로 읽기 쉽도록 컬럼명 변경
     grouped_df.columns = ['갯수:건수', '합계:금액']
 
@@ -236,7 +238,7 @@ def merge_edi_opera(work_date):
     #       정렬 작업 전후로, 멀티 인텍스를 임시로 해제 및 복구
     grouped_df.reset_index(inplace=True)                                    # 먼저, dataframe의 index를 리셋해서 멀티 인덱스 해제
     grouped_df.sort_values(by='Description', key=card_sort, inplace=True)   # key함수를 이용해서 정렬
-    grouped_df.set_index(['매입카드사', 'Description'], inplace=True)       # 다시 원래 형태의 grouping 형태대로 index 셋팅
+    grouped_df.set_index(['매입카드사', 'Description'], inplace=True)        # 다시 원래 형태의 grouping 형태대로 index 셋팅
     
     # 10-4. 기존의 KICC 카드거래내역 엑셀 파일에 추가 모드로 저장
     try:
