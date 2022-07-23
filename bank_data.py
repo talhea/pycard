@@ -75,7 +75,7 @@ def to_bank_df(work_date):
     #------------------------------------------------------------------------------------------------------------------
 
     # 4. 농협의 xml 파일은 실제 내용은 html, 따라서 BeautifulSoup를 이용해서 읽어들임
-    nh_filename = receipts_date + '.xls'                     # 읽을 파일 이름 'YYYYMMDD.xls'
+    nh_filename = receipts_date + '.xls'            # 읽을 파일 이름 'YYYYMMDD.xls'
     
     #   BeautifulSoup 객체로 읽어들임
     try:
@@ -139,7 +139,7 @@ def to_bank_df(work_date):
     # 9-2. 날짜 포맷 : '%Y-%m-%d'
     bank_df['date'] = bank_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore') # 날짜 포맷 : '%Y-%m-%d'
     
-    # 10. df디렉토리에 dataframe 저장
+    # 10. dfdata 디렉토리에 저장
     dfdata_dir = f'./data/{target_date}/dfdata/'        # 데이타를 저장할 df디렉토리 './data/YYYYMMDD/dfdata/'
     
     # 10-1. 목적지 df디렉토리 확인하고 없으면 생성
@@ -155,7 +155,7 @@ def to_bank_df(work_date):
     
     # 10-2. dataframe 저장
     try:
-        df_filename = 'df_bank_' + receipts_date      # 저장할 dataframe 파일 이름 'df_bank_YYYYMMDD'
+        df_filename = 'df_bank_' + receipts_date        # 저장할 dataframe 파일 이름 'df_bank_YYYYMMDD'
 
         with open(dfdata_dir + df_filename, "wb") as file:
             pickle.dump(bank_df, file)
@@ -166,18 +166,48 @@ def to_bank_df(work_date):
             )
         raise(e)
     
-    # 10-3. dataframe 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    # 10-3. Dataframe을 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    from openpyxl.utils.dataframe import dataframe_to_rows
+    import openpyxl
+    from openpyxl.styles import Alignment
+
+    #   새로운 워크북/시트 생성
+    bank_wb = openpyxl.Workbook()
+    bank_sheet = bank_wb.active
+    bank_sheet.title = f'{receipts_date}'
+
+    #   openpyxl에 Datframe을 저장
+    for row in dataframe_to_rows(bank_df, index=False, header=True):            # index 제외
+        bank_sheet.append(row)
+
+    #   각 컬럼의 width 설정
+    for idx in range(97, 97 + bank_sheet.max_column):                           # 영문 'A'의 십진수 97...
+        bank_sheet.column_dimensions[chr(idx)].width = 13.6
+
+    #   column 이름을 강조하는 'Pandas' style
+    for cell in bank_sheet[1]:
+        cell.style = 'Pandas'
+
+    #   숫자를 제외한 모든 컬럼의 셀 정렬
+    for cell in bank_sheet['A'] + bank_sheet['C'] + bank_sheet['D']:
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    #   'B'컬럼들의 숫자 포맷 셋팅
+    for cell in bank_sheet['B']:
+        cell.number_format = '#,### '
+
     try:
-        xl_filename = df_filename + '.xlsx'         # 저장파일 'df_bank_YYYYMMDD.xlsx'
+        target_dir = f'./data/{target_date}'            # 저장 위치 './data/YYYYMMDD'
+        xl_filename = df_filename + '.xlsx'             # 저장파일 'df_bank_YYYYMMDD.xlsx'
         
-        with pnds.ExcelWriter(dfdata_dir + xl_filename, mode='w', engine='openpyxl') as writer:
-            bank_df.to_excel(writer, sheet_name=f'{receipts_date}', index=False)
+        bank_wb.save(target_dir + xl_filename)
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
                 f'[kicc_history.py - Making Excel] <{datetime.datetime.now()}> Pandas.ExcelWriter error ({xl_filename}) ===> {e}\n'
             )
         raise(e)
+
 
 if __name__ == '__main__':
     to_bank_df(datetime.datetime.now())
