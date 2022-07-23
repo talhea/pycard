@@ -224,11 +224,8 @@ def merge_edi_opera(work_date):
     grouped_df.columns = ['갯수:건수', '합계:금액']
 
     # 10-3. dataframe의 행 순서를 EDI 엑셀파일 카드 순서대로 변경
-    #       EDI 엑셀파일의 카드 순서를 나타내는 리스트와 이 리스트를 이용하는 정렬용 key 함수
-    ordered_card = {'LT': 1, 'KEB': 2, 'JCB': 3, 'VISA': 4, 'MASTER': 5, 'SA': 6,
-                    'SS': 7, 'SH': 8, 'BC': 9, 'KB': 10, 'HD': 11, 'NH': 12, 'CITI': 13}
-    
-    def card_sort(series):
+    #       EDI 엑셀파일의 카드 순서 리스트를 이용하는 정렬용 key 함수
+    def card_sort(series) -> pnds.Series:
         """ordered_card 리스트를 이용하는 정렬용 key함수
         인수로 전달된 카드 영문 단축명에 따라서, opdered_card의 value(정렬용 값)을 series로 반환
 
@@ -239,6 +236,10 @@ def merge_edi_opera(work_date):
             series (int): 인수로 들어온 series와 매칭되는 정열용 값을 가진 series
         """
 
+        # EDI 엑셀 파일내의 카드 순서 표시
+        ordered_card = {'LT': 1, 'KEB': 2, 'JCB': 3, 'VISA': 4, 'MASTER': 5, 'SA': 6,
+                        'SS': 7, 'SH': 8, 'BC': 9, 'KB': 10, 'HD': 11, 'NH': 12, 'CITI': 13}
+        
         return series.apply(lambda col: ordered_card.get(col, 100))
     
     #       정렬 작업 전후로, 멀티 인텍스를 임시로 해제 및 복구

@@ -3,7 +3,7 @@ import schedule, datetime, time
 import edi_opera, opera_xml
 import down_opera, down_kicc, down_ibk, down_nh
 import kicc_history, kicc_receipts
-import bank_data
+import bank_data, pivot_on_excel
 import preparation
 
 today = datetime.datetime.now()
@@ -35,6 +35,9 @@ schedule.every().day.at("07:30").do(kicc_receipts.to_receipts_history_df, today)
 
 # edi_opera.merge_edi_opera(yesterday)
 schedule.every().day.at("07:35").do(edi_opera.merge_edi_opera, yesterday)
+
+# pivot_on_excel.to_xcel(yesterday)
+schedule.every().day.at("07:40").do(pivot_on_excel.to_xcel, yesterday)
 
 # down_nh.down(today)
 schedule.every().day.at("12:55").do(down_nh.down, today)

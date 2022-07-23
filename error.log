@@ -42,3 +42,6 @@
 [kicc_history.py - Making Excel] <2022-07-17 09:46:23.001109> Pandas.ExcelWriter error (./df_kicc_history_20220710) ===> [Errno 13] Permission denied: './dfdata/20220710/df_kicc_history_20220710.xlsx'
 [kicc_history.py - Reading Data] <2022-07-20 15:43:56.896870> Pandas excel-reading error (./신용거래내역조회_220617.xlsx) ===> Unable to convert column 금액 to type int64
 [edi_opera.py - Reading Data] <2022-07-22 08:13:30.531063> pickle file-reading error (df_kicc_history_20220714) ===> [Errno 2] No such file or directory: './data/20220714/dfdata/df_kicc_history_20220714'
+[edi_opera.py - Reading Data] <2022-07-23 09:07:40.805940> pickle file-reading error (df_kicc_history_20220714) ===> [Errno 2] No such file or directory: './data/20220714/dfdata/df_kicc_history_20220714'
+[edi_opera.py - Reading Data] <2022-07-23 09:56:17.852029> pickle file-reading error (df_kicc_history_20220713) ===> [Errno 2] No such file or directory: './dfdata/20220713/df_kicc_history_20220713'
+[edi_opera.py - Reading Data] <2022-07-23 10:00:34.271713> openpyxl file-reading error (./신용거래내역조회_tmp.xlsx) ===> list indices must be integers or slices, not str

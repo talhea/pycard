@@ -25,13 +25,14 @@ def get_dup_serials(work_date) -> list:
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
     excel_filename = f'신용거래내역조회_{source_date}.xlsx'
     
+    #   '신용거래내역조회' 작업 파일 로딩
     try:
-        if os.path.exists(source_dir + excel_filename):                     # 2일 전 신용거래내역조회 파일이 있을 경우
+        if os.path.exists(source_dir + excel_filename):                         # 2일 전 신용거래내역조회 파일이 있을 경우
             edi_excel = openpyxl.load_workbook(source_dir + excel_filename, data_only=False)    # 수식파일 포함하여 엑셀파일 읽어 들임
             ws = edi_excel[edi_excel.sheetnames[1]]                                             # 두번쨰 sheet 선택
         else:
             print('tomorrow_history.py : 휴일인듯, 신용거래내역 없음')
-            return (list())
+            return (list())                                                     # 빈 리스트 반환
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
@@ -39,14 +40,14 @@ def get_dup_serials(work_date) -> list:
             )
         raise(e)
 
-    red_rows = []                               # 거래고유번호 리스트 
-    tommorow = work_date.strftime('%d')         # 내일 날짜의 일(day)
+    serial_rows = []                                # 거래고유번호 리스트 
+    tommorow = work_date.strftime('%d')             # 내일 날짜의 일(day): 'DD' (두자리 문자열)
     
-    for serial_num_string in ws['A']:               # '거래고유번호' 컬럼 looping
+    for serial_num_string in ws['A']:               # 'A'컬럼('거래고유번호')  looping
         if serial_num_string.value.startswith(tommorow):    # '거래고유번호'의 시작이 내일날짜의 일(day)로 시작하는 경우
-            red_rows.append(serial_num_string.value)        # 해당 거래는 내일 날짜 거래이므로, 이 떄의 '거래고유번호'를 리스트에 저장
+            serial_rows.append(serial_num_string.value)     # 해당 거래는 내일 날짜 거래이므로, 이 떄의 '거래고유번호'를 리스트에 저장
     
-    return red_rows                         # 리스트 반환
+    return serial_rows                              # 리스트 반환
 
 
 if __name__ == '__main__':
