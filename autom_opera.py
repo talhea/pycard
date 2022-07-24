@@ -15,6 +15,7 @@ def get_date():
 
 schedule.every().day.at("06:50").do(get_date)
 
+
 # preparation.ready(yesterday)
 schedule.every().day.at("07:00").do(preparation.ready, yesterday)
 
@@ -23,6 +24,7 @@ schedule.every().day.at("07:05").do(down_opera.down, yesterday)
 
 # down_kicc.down(today)
 schedule.every().day.at("07:10").do(down_kicc.down, today)
+
 
 # opera_xml.to_opera_df(yesterday)
 schedule.every().day.at("07:20").do(opera_xml.to_opera_df, yesterday)
@@ -33,11 +35,13 @@ schedule.every().day.at("07:25").do(kicc_history.to_card_history_df, yesterday)
 # kicc_receipts.to_receipts_history_df(today)
 schedule.every().day.at("07:30").do(kicc_receipts.to_receipts_history_df, today)
 
+
 # edi_opera.merge_edi_opera(yesterday)
 schedule.every().day.at("07:35").do(edi_opera.merge_edi_opera, yesterday)
 
 # pivot_on_excel.to_xcel(yesterday)
 schedule.every().day.at("07:40").do(pivot_on_excel.to_excel, yesterday)
+
 
 # down_nh.down(today)
 schedule.every().day.at("12:55").do(down_nh.down, today)
