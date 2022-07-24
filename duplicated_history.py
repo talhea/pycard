@@ -1,7 +1,4 @@
-'''파일 '신용거래내역조회_YYMMDD'에서 두번째 sheet의 붉은 색 row 정보 얻기
-이전 마감 날짜의 오페라 카드 매출에 등록된 카드 신용거래내역중에, 당일 거래 내역이 있다면 붉은색으로 셋팅되어 있음.
-따라서 이 색이 셋팅된 row 들을 획득하여, 그 중 '거래고유번호'를 반환한다
-
+'''이전(인수 날짜의 하루 전)의 거래내역에서 인수로 들어온 날(당일)로 된 '거래고유번호' 리스트를 반환한다
 '''
 
 from csv import excel
@@ -21,9 +18,9 @@ def get_dup_serials(work_date) -> list:
         list: {'거래고유번호' ...}
     """    
     # 1. 2일 전 마감된 신용카드 거래 내역 파일을 읽는다
-    source_date = (work_date - datetime.timedelta(1)).strftime('%y%m%d')        # '신용거래내역_YYMMDD'용 날짜 포맷, 2일 전 날짜
+    two_days_ago = (work_date - datetime.timedelta(1)).strftime('%y%m%d')       # '신용거래내역_YYMMDD'용 날짜 포맷, 2일 전 날짜
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
-    excel_filename = f'신용거래내역조회_{source_date}.xlsx'
+    excel_filename = f'신용거래내역조회_{two_days_ago}.xlsx'
     
     #   '신용거래내역조회' 작업 파일 로딩
     try:
@@ -40,12 +37,14 @@ def get_dup_serials(work_date) -> list:
             )
         raise(e)
 
-    serial_rows = []                                # 거래고유번호 리스트 
-    tommorow = work_date.strftime('%d')             # 내일 날짜의 일(day): 'DD' (두자리 문자열)
+    # 2. 버퍼 리스트에 당일 날짜의 거래고유번호를 찾아서 저장한다
+    serial_rows = []                                # 거래고유번호 버퍼
+    target_day = work_date.strftime('%d')           # 당일(어제)) 날짜의 일(day): 'DD' (두자리 문자열)
     
+    #   엑셀의 'A'컬럼에서 각 값의 시작 글자를 확인해서 거래고유번호 추출
     for serial_num_string in ws['A']:               # 'A'컬럼('거래고유번호')  looping
-        if serial_num_string.value.startswith(tommorow):    # '거래고유번호'의 시작이 내일날짜의 일(day)로 시작하는 경우
-            serial_rows.append(serial_num_string.value)     # 해당 거래는 내일 날짜 거래이므로, 이 떄의 '거래고유번호'를 리스트에 저장
+        if serial_num_string.value.startswith(target_day):  # 2일 전 거래내역에서의 '거래고유번호'의 시작이 당일(어제)날짜의 일(day)로 시작하는 경우
+            serial_rows.append(serial_num_string.value)     # 해당 거래는 현(당일) 작업 날짜와 중복되는 내용이므로, 이 떄의 '거래고유번호'를 리스트에 저장
     
     return serial_rows                              # 리스트 반환
 

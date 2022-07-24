@@ -11,7 +11,7 @@ import re
 def to_bank_df(work_date):
     """다운로드 받은 기업은행, 농협(민국은행)의 입금 내역을 dataframe으로 저장한다
     첫째, 기업은행 입금 내역을 readlines함수로 한 줄씩 읽어, 각 줄을 '|' 구분자로 다시 분리한 후 dataframe으로 만들고 전처리 과정을 거친다.
-    둘째, 농협(민국은행) 입금 내역을 BeautifulSoup 객체로 읽어들여, 
+    둘째, 농협(민국은행) 입금 내역을 BeautifulSoup 객체로 읽어 Dataframe으로 전환해서 전 처리를 한다.
     세째, 두 데이터를 합쳐 저장한다
     
     Args:
@@ -166,7 +166,7 @@ def to_bank_df(work_date):
             )
         raise(e)
     
-    # 10-3. Dataframe을 그대로 excel로 저장 => 추후에 사용 가능할수 있음
+    # 10-3. Dataframe을 그대로 excel로 저장 => 추후에 사용 가능할 수 있음
     from openpyxl.utils.dataframe import dataframe_to_rows
     import openpyxl
     from openpyxl.styles import Alignment
