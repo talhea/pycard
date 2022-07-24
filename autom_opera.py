@@ -37,7 +37,7 @@ schedule.every().day.at("07:30").do(kicc_receipts.to_receipts_history_df, today)
 schedule.every().day.at("07:35").do(edi_opera.merge_edi_opera, yesterday)
 
 # pivot_on_excel.to_xcel(yesterday)
-schedule.every().day.at("07:40").do(pivot_on_excel.to_xcel, yesterday)
+schedule.every().day.at("07:40").do(pivot_on_excel.to_excel, yesterday)
 
 # down_nh.down(today)
 schedule.every().day.at("12:55").do(down_nh.down, today)

@@ -55,9 +55,9 @@ def merge_edi_opera(work_date):
     #------------------------------------------------------------------------------------------------------------------
     
     # 3. 오페라 어제 마감된 trial report(df_trial_balance_날짜) dataframe 로딩
-    target_date = work_date.strftime('%Y%m%d')                  # 어제 날짜 포맷
+    target_date = work_date.strftime('%Y%m%d')                              # 어제 날짜 포맷
     
-    dfdata_dir = f'./data/{target_date}/dfdata/'                # 읽어들일 dfdata디렉토리 './data/YYYYMMDD/dfdata/'
+    dfdata_dir = f'./data/{target_date}/dfdata/'                            # 읽어들일 dfdata디렉토리 './data/YYYYMMDD/dfdata/'
     opera_xl_filename = 'df_opera_trial_' + target_date
     
     #   Datafarame loading
@@ -81,7 +81,7 @@ def merge_edi_opera(work_date):
     #------------------------------------------------------------------------------------------------------------------
     
     # 5. KICC로부터 생성한 신용카드 승인내역 dataframe
-    card_xl_filename = 'df_kicc_history_' + target_date         # 파일 이름: df_kicc_history_YYYYMMDD
+    card_xl_filename = 'df_kicc_history_' + target_date                     # 파일 이름: df_kicc_history_YYYYMMDD
     
     #   KICC 카드 승인내역 Dataframe loading
     try:
@@ -97,90 +97,90 @@ def merge_edi_opera(work_date):
     #   이전(2일 전) 거래내역 중, 이미 등록된 어제 날짜 내역 제거
     del_dup_serials = duplicated_history.get_dup_serials(work_date)
     if len(del_dup_serials) != 0:                                           # 이전 내역에 포함된 내역이 있을 경우
-        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_dup_serials) == False]   # isin()결과가 False 인 것만 추출
+        card_history_df = card_history_df[card_history_df['거래고유번호'].isin(del_dup_serials) == False]           # isin()결과가 False 인 것만 추출
     
-    #   내일 날짜는 제외 - 일단 제외하고....
-    date_str = (work_date + datetime.timedelta(1)).strftime("%Y-%m-%d")                                     # 내일 날짜 포맷
-    card_history_df = card_history_df[card_history_df['date'].str.contains(date_str, na=False) == False]
+    #   내일 날짜는 제외 - 해당 날짜의 거래내역만 추출
+    tomorrow = (work_date + datetime.timedelta(1)).strftime('%d')                                                   # 내일 날짜의 day: 'DD' (두자리 문자열)
+    card_history_df = card_history_df[card_history_df['거래고유번호'].str.startswith(tomorrow, na=False) == False]  # 거래고유번호가 내일날자(DD)로 시작되지 않는것들만
     
     # 6. 각 카드 내역들을 EDI 엑셀 파일의 카드 분류에따라 재분류
     # 6-1. '카드분류'(card code) 컬럼과 그 영문 단축명인 'Description' 컬럼 생성
     card_history_df['카드분류'] = '분류'
     card_history_df['Description'] = '영문명'     # 'LT', 'KEB', 'JCB', 'VISA', 'MASTER', 'SA', 'SS', 'SH', 'BC', 'KB', 'HD', 'NH', 'CITI'
     
-    # 'LT'
+    #   'LT'
     condition = (card_history_df['매입카드사'].str.startswith('롯데', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9244'
     card_history_df.loc[collected_cards, 'Description'] = 'LT'
 
-    # 'KEB'
+    #   'KEB'
     condition = (card_history_df['매입카드사'] == '하나구외환')  & (card_history_df['발급카드사'].str.startswith('하나', na=False) | card_history_df['발급카드사'].str.startswith('토스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9243'
     card_history_df.loc[collected_cards, 'Description'] = 'KEB'
 
-    # 'JCB'
+    #   'JCB'
     condition = (card_history_df['발급카드사'].str.contains('제이씨비', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9235'
     card_history_df.loc[collected_cards, 'Description'] = 'JCB'
 
-    # 'VISA'
+    #   'VISA'
     condition = (card_history_df['발급카드사'].str.contains('해외비자', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9231'
     card_history_df.loc[collected_cards, 'Description'] = 'VISA'
 
-    # 'MASTER'
+    #   'MASTER'
     condition = (card_history_df['발급카드사'].str.contains('해외마스타', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9233'
     card_history_df.loc[collected_cards, 'Description'] = 'MASTER'
 
-    # 'SA'
+    #   'SA'
     condition = (card_history_df['발급카드사'].str.contains('해외아멕스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9232'
     card_history_df.loc[collected_cards, 'Description'] = 'SA'
 
-    # 'SS'
+    #   'SS'
     condition = (card_history_df['발급카드사'].str.startswith('삼성', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9239'
     card_history_df.loc[collected_cards, 'Description'] = 'SS'
 
-    # 'SH'
+    #   'SH'
     condition = (card_history_df['매입카드사'].str.startswith('신한', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9242'
     card_history_df.loc[collected_cards, 'Description'] = 'SH'
 
-    # 'BC'
+    #   'BC'
     condition = (card_history_df['매입카드사'].str.startswith('비씨', na=False))      # 'CITI'씨티카드와 중복되지만, 'CITI'는 마지막에 다시 셋팅
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9237'
     card_history_df.loc[collected_cards, 'Description'] = 'BC'
 
-    # 'KB'
+    #   'KB'
     condition = (card_history_df['매입카드사'].str.startswith('국민', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9238'
     card_history_df.loc[collected_cards, 'Description'] = 'KB'
 
-    # 'HD'
+    #   'HD'
     condition = (card_history_df['매입카드사'].str.startswith('현대', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9245'
     card_history_df.loc[collected_cards, 'Description'] = 'HD'
 
-    # 'NH'
+    #   'NH'
     condition = (card_history_df['매입카드사'].str.startswith('NH', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9240'
     card_history_df.loc[collected_cards, 'Description'] = 'NH'
 
-    # 'CITI'
+    #   'CITI'
     condition = (card_history_df['발급카드사'].str.startswith('씨티', na=False)) & (card_history_df['발급카드사'].str.contains('비씨', na=False) == False)
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9241'
@@ -215,10 +215,9 @@ def merge_edi_opera(work_date):
             )
         raise(e)
     
-    # 10. grouping된 dataframe을 기존 KICC 신용거래내역 엑셀파일에 추가로 저장
+    # 10. grouping된 dataframe을 기존 df_kicc_history 엑셀파일에 추가 sheet로 저장
     # 10-1. 카드별 건수와 합계 금액 dataframe 생성: pivot(또는 groupby)를 이용하여 grouping
     grouped_df = pnds.pivot_table(card_history_df, index=['매입카드사', 'Description'], values=['금액'], aggfunc=['count', 'sum'], margins = True)
-    
     
     # 10-2. 멀티 컬럼이므로 읽기 쉽도록 컬럼명 변경
     grouped_df.columns = ['갯수:건수', '합계:금액']
