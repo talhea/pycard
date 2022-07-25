@@ -20,7 +20,6 @@ def get_dup_serials(work_date) -> list:
     # 1. 2일 전 마감된 신용카드 거래 내역 파일을 읽는다
     one_day_ago = (work_date - datetime.timedelta(1)).strftime('%y%m%d')       # '신용거래내역_YYMMDD'용 날짜 포맷, 하루 전(실제로는 2일) 날짜
     source_dir = 'C:/FA/creditcard/EDI_Confirm/'
-    source_dir = './confirm/'
     excel_filename = f'신용거래내역조회_{one_day_ago}.xlsx'
     
     #   '신용거래내역조회' 작업 파일 로딩
