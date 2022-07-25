@@ -1,4 +1,7 @@
 {
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": false
+    "python.linting.enabled": false,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none"
+    }
 }
