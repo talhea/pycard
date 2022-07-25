@@ -9,17 +9,17 @@ import datetime
 
 def to_excel(work_date: datetime):
     '''pivot table이 있는 엑셀 템플릿 파일을 이용하여 KICC 카드거래내역을 pivot table로 셋팅한 엑셀 파일로 저장
-    어제 날짜의 KICC 거래내역 Dataframe을 읽어서, pivot teble이 설정된 엑셀 템플릿 파일의 원본 데이터 sheet에 주입한다
+    edi_opera.py에서 보정되어 저장된 어제 날짜의 KICC 거래내역 Dataframe을 읽어서, pivot teble이 설정된 엑셀 템플릿 파일의 원본 데이터 sheet에 주입한다
     이 때, pivot table이 자동으로 refresh되도록 셋팅하든지 혹은 수동으로 파일 오픈 후 새로고침 한다.
 
     Args:
         work_date (datetime): 어제 날짜
     '''
 
-    # 1. dataframe으로 저장된 KICC 카드거래내역 읽기
+    # 1. 보정된 dataframe으로 저장된 KICC 카드거래내역 읽기
     target_date = work_date.strftime("%Y%m%d")                          # 어제 날짜 포맷
 
-    dfdata_dir = f'./data/{target_date}/dfdata/'                        # 읽어들일 dfdata디렉토리 './data/YYYYMMDD/dfdata/'
+    dfdata_dir = f'./data/{target_date}/'                               # 읽어들일 디렉토리 './data/YYYYMMDD/dfdata/'
     df_filename = 'df_kicc_history_' + target_date                      # 파일 이름: df_kicc_history_YYYYMMDD
 
     #   카드거래내역 Datafarame loading
@@ -61,12 +61,12 @@ def to_excel(work_date: datetime):
         data_ws.append(row)
     
     # 4. Sheet 이름 변경
-    data_ws.title = work_date.strftime('%y%m%b')                                        # shee 이름: 'YYMMDD'
+    data_ws.title = work_date.strftime('%y%m%d')                                        # shee 이름: 'YYMMDD'
     
     # 5. 엑셀 파일 저장
     try:
         target_dir = f'./data/{target_date}/'                                           # 저장위치 : './data/YYYYMMDD/'
-        xl_filename = '신용거래내역조회_' + work_date.strftime('%y%m%b') + '.xlsx'       # 저장파일 '신용거래내역조회_YYMMDD.xlsx'
+        xl_filename = '신용거래내역조회_' + work_date.strftime('%y%m%d') + '.xlsx'       # 저장파일 '신용거래내역조회_YYMMDD.xlsx'
         print(target_dir + xl_filename)
 
         edi_excel.save(target_dir + xl_filename)

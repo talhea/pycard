@@ -25,6 +25,12 @@ def to_bank_df(work_date):
     ibk_filename = '거래내역조회_입출식 예금' + receipts_date  + '.txt'                 # 읽을 파일 이름 '거래내역조회_입출식 예금YYYYMMDD.txt'
 
     # 1-1. .txt 파일을 한 줄씩 읽어서 리스트에 넣는다.
+    #   기업은행 입금 내역이 없으면 pass
+    if os.path.exists(downdata_dir + ibk_filename) == False:
+        print('IBK 은행 입금 내역 없음')
+        return
+    
+    #   입금내역 txt파일을 라인 단위로 읽어들인다
     try:
         with open(downdata_dir + ibk_filename, 'r', encoding='euc-kr') as file:
             lines = file.readlines()
@@ -197,7 +203,7 @@ def to_bank_df(work_date):
         cell.number_format = '#,### '
 
     try:
-        target_dir = f'./data/{target_date}'            # 저장 위치 './data/YYYYMMDD'
+        target_dir = f'./data/{target_date}/'           # 저장 위치 './data/YYYYMMDD'
         xl_filename = df_filename + '.xlsx'             # 저장파일 'df_bank_YYYYMMDD.xlsx'
         
         bank_wb.save(target_dir + xl_filename)

@@ -103,6 +103,21 @@ def merge_edi_opera(work_date):
     tomorrow = (work_date + datetime.timedelta(1)).strftime('%d')                                                   # 내일 날짜의 day: 'DD' (두자리 문자열)
     card_history_df = card_history_df[card_history_df['거래고유번호'].str.startswith(tomorrow, na=False) == False]  # 거래고유번호가 내일날자(DD)로 시작되지 않는것들만
     
+    #   보정된 Dataframe을 './data/YYYYMMDD/' 폴더에 저장해서 pivot_on_excel.py에서 이용
+    try:
+        target_dir = f'./data/{target_date}/'               # 수정된 파일 저장할 날짜 폴더 '/data/YYYYMMDD/'
+        df_filename = 'df_kicc_history_' + target_date      # 저장할 dataframe 파일 이름 'df_kicc_history_YYYYMMDD'
+        print(target_dir + df_filename)
+        
+        with open(target_dir + df_filename, "wb") as file:
+            pickle.dump(card_history_df, file)
+    except Exception as e:
+        with open('./error.log', 'a') as file:
+            file.write(
+                f'[kicc_history.py - Making Dataframe] <{datetime.datetime.now()}> pickle.dump error ({df_filename}) ===> {e}\n'
+            )
+        raise(e)
+    
     # 6. 각 카드 내역들을 EDI 엑셀 파일의 카드 분류에따라 재분류
     # 6-1. '카드분류'(card code) 컬럼과 그 영문 단축명인 'Description' 컬럼 생성
     card_history_df['카드분류'] = '분류'
@@ -201,7 +216,7 @@ def merge_edi_opera(work_date):
     edi_ws.title = str(work_date.day)                   # sheet 이름 변경
     
     # 9. EDI 엑셀 파일 저장
-    target_dir = f'./data/{target_date}/'               # 날짜 폴더에 저장 '/data/YYYYMMDD/'
+    
     
     try:
         excel_filename = 'EDI-' + target_date + '.xlsx' # 'EDI-YYYYMMDD.xlsx'

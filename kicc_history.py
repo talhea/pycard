@@ -56,7 +56,7 @@ def to_card_history_df(work_date):
     # 2-6. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # # 2-8. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
+    # # 2-7. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
     # card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
 
     # 3. df디렉토리에 dataframe 저장
