@@ -66,7 +66,7 @@ def to_bank_df(work_date):
     # 2-4. details 컬럼에 'BC' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경    # 국내 승인된 BC가 입금될떄
     bc_expr = "details.str.endswith('BC')"          # BC로 끝나는 문자열
     bc_lst = ibk_df.query(bc_expr).index.tolist()   # 조건 부합하는 열 값을 가진 행을 추출
-    ibk_df.loc[bc_lst, 'holder'] = 'BC'             # kb_lst 리스트에 포함된 모든 행의 'holder'컬럼 값 'KB'로 변경
+    ibk_df.loc[bc_lst, 'holder'] = 'BC'             # bc_lst 리스트에 포함된 모든 행의 'holder'컬럼 값 'KB'로 변경
 
     # 2-5. details 컬럼에 'KB' 문자열 포함한 행들 추출해서 'holder' 컬럼 값 변경
     kb_expr = "details.str.startswith('KB')"        # KB로 시작하는 문자열
@@ -102,7 +102,7 @@ def to_bank_df(work_date):
     for content in content_soup:                # 각 컬럼을 looping
         row_lst.append(re.sub('([0-9,]+) 원', '\\1', content.get_text().strip()))   # text 주변의 공백을 제거한 내용만 추출
 
-    if len(content_soup) >= 5:                  # 입금 내역이 있을때만, 입금 내역이 있다면 최소한 5 이상의 길이(컬럼 수가 5개)가 나온다
+    if len(content_soup) >= 5:                  # 입금 내역이 있을때만: 입금 내역이 있다면 최소한 5 이상의 길이(컬럼 수가 5개)가 나온다
         # 5-2. content 리스트를 dataframe으로 변환 ['날짜', '출금', '입금', '잔액', '적요']
         nh_df = pnds.DataFrame([row_lst], columns=['date', 'drawing', 'receipts', 'balance', 'holder'])
 

@@ -216,8 +216,6 @@ def merge_edi_opera(work_date):
     edi_ws.title = str(work_date.day)                   # sheet 이름 변경
     
     # 9. EDI 엑셀 파일 저장
-    
-    
     try:
         excel_filename = 'EDI-' + target_date + '.xlsx' # 'EDI-YYYYMMDD.xlsx'
         print(target_dir + excel_filename)
@@ -231,7 +229,7 @@ def merge_edi_opera(work_date):
         raise(e)
     
     # 10. grouping된 dataframe을 기존 df_kicc_history 엑셀파일에 추가 sheet로 저장
-    # 10-1. 카드별 건수와 합계 금액 dataframe 생성: pivot(또는 groupby)를 이용하여 grouping
+    # 10-1. 카드별 건수와 합계 금액 grouping dataframe 생성: pivot(또는 groupby)를 이용하여 grouping
     grouped_df = pnds.pivot_table(card_history_df, index=['매입카드사', 'Description'], values=['금액'], aggfunc=['count', 'sum'], margins = True)
     
     # 10-2. 멀티 컬럼이므로 읽기 쉽도록 컬럼명 변경

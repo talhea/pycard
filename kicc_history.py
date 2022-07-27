@@ -27,7 +27,7 @@ def to_card_history_df(work_date):
                                         dtype={'거래고유번호': str,                     # 너무 큰 숫자들이므로 문자열로 셋팅
                                                 '금액': 'int64',
                                                 '승인번호': str},                       # 영문이나 숫자 '0'도 표시되어야 함으로 str 타입으로!
-                                        na_values=None
+                                        na_values=None                                  # NaN 값들은 None으로 표시
                                         )
     except Exception as e:
         with open('./error.log', 'a') as file:
@@ -56,9 +56,6 @@ def to_card_history_df(work_date):
     # 2-6. date 기준 sorting
     card_history_df.sort_values(by=['date'], inplace=True)
     
-    # # 2-7. date 정렬이후 포맷 변경: '%Y-%m-%d' (시간부분 제거)
-    # card_history_df['date'] = card_history_df['date'].map(lambda str_data: str_data.split()[0], na_action='ignore')
-
     # 3. df디렉토리에 dataframe 저장
     # 3-1. 목적지 df디렉토리 확인하고 없으면 생성
     dfdata_dir = f'./data/{target_date}/dfdata/'        # 데이타를 저장할 df디렉토리 './data/YYYYMMDD/dfdata/'
