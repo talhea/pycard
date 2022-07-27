@@ -211,7 +211,7 @@ def to_bank_df(work_date):
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
-                f'[kicc_history.py - Making Excel] <{datetime.datetime.now()}> Pandas.ExcelWriter error ({xl_filename}) ===> {e}\n'
+                f'[kicc_history.py - Making Excel] <{datetime.datetime.now()}> openpyxl save() error ({xl_filename}) ===> {e}\n'
             )
         raise(e)
 
