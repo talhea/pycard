@@ -44,8 +44,8 @@ def to_bank_df(work_date):
     # 1-2. 리스트의 각 라인을 '|' 기준으로 분리해서 dataframe을 만든다
     lines = list(map(lambda line: line.strip().split('|'), lines))      # '\n' 제거하고 '|' 단위로 분해
     ibk_df = pnds.DataFrame(lines)                                      # DataFrame 생성
-    ibk_df.rename(columns=ibk_df.iloc[0], inplace=True)                 # 첫번쨰 행 컬럼으로 지정
-    ibk_df.drop(ibk_df.index[0], inplace=True)                          # 중복되는 첫번째 행 삭제
+    ibk_df.rename(columns=ibk_df.iloc[0], inplace=True)                 # 첫번쨰 행을 컬럼이름으로 지정
+    ibk_df.drop(ibk_df.index[0], inplace=True)                          # 위 라인 실행결과로 중복되는 첫번째 행 삭제
 
     # 2. 데이터 전처리
     # 2-1. 필요 컬럼 추출하고 컬럼명 변경
@@ -201,7 +201,8 @@ def to_bank_df(work_date):
     #   'B'컬럼들의 숫자 포맷 셋팅
     for cell in bank_sheet['B']:
         cell.number_format = '#,### '
-
+    
+    #   엑셀 저장
     try:
         target_dir = f'./data/{target_date}/'           # 저장 위치 './data/YYYYMMDD'
         xl_filename = df_filename + '.xlsx'             # 저장파일 'df_bank_YYYYMMDD.xlsx'
