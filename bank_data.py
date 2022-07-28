@@ -133,7 +133,7 @@ def to_bank_df(work_date):
     #------------------------------------------------------------------------------------------------------------------
 
     # 8. 기업은행 데이타프레임(ibk_df)와 농협 데이타프레임(nh_df)를 합친다
-    if nh_df.empty == True:                                     # 입금 내역이 없음
+    if nh_df.empty == True:                                     # NH 입금 내역이 없음
         bank_df = ibk_df
     else:
         bank_df = pnds.concat([ibk_df, nh_df], ignore_index=True)
