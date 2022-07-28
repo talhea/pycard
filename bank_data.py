@@ -126,14 +126,14 @@ def to_bank_df(work_date):
         # 7. NH카드 입금 라인만 추출
         nh_df = nh_df[nh_df['holder'].isin(['NH'])]
     else:       # 입금내역이 없으므로 None 셋팅
-        nh_df = None
+        nh_df = pnds.DataFrame(columns=range(5))                # 빈 Dataframe 생성
 
     #------------------------------------------------------------------------------------------------------------------
     # 농협 끝, 기업은행과 눙협 합치기
     #------------------------------------------------------------------------------------------------------------------
 
     # 8. 기업은행 데이타프레임(ibk_df)와 농협 데이타프레임(nh_df)를 합친다
-    if nh_df.empty:     # 입금 내역이 없음
+    if nh_df.empty == True:                                     # 입금 내역이 없음
         bank_df = ibk_df
     else:
         bank_df = pnds.concat([ibk_df, nh_df], ignore_index=True)
