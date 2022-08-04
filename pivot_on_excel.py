@@ -31,6 +31,7 @@ def to_excel(work_date: datetime):
             file.write(
                 f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({df_filename}) ===> {e}\n'
             )
+        # 기능에러가 아닌 카드 거래내역 파일 자체가 없는 경우에도 문제이므로 프로그램 종료
         raise(e)
     
     # 2. Pivot table 셋팅된 템플릿 엑셀 파일을 준비
@@ -51,9 +52,10 @@ def to_excel(work_date: datetime):
             file.write(
                 f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({history_template_filename}) ===> {e}\n'
             )
+        # 기능에러가 아닌 카드 거래내역 파일 자체가 없는 경우에도 문제이므로 프로그램 종료
         raise(e)
 
-    # 2-2. 1행부터 데이터 행 갯수만큼의(전체) 원본 데이터 삭제
+    # 2-2. 1행부터 데이터 행 갯수만큼(전체) 원본 데이터 삭제
     data_ws.delete_rows(1, data_ws.max_row)
 
     # 3. Dataframe을 엑셀에 주입

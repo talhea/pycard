@@ -1,10 +1,8 @@
 
 # KICC site로부터 '신용카드 거래내역'과 '입금현황' 총 2개 파일을 내려받는다
 
-from ast import ExceptHandler
 import pyautogui as gui
 import datetime
-import os, shutil
 import moving_to_folder as todown
 
 def down(work_date):

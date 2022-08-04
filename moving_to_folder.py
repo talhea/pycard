@@ -27,16 +27,13 @@ def to_downdata(source_file: str, target_dir: str) -> None:
 
     # 3. 목적지로 파일 옮기기
     try:
-        if os.path.exists(source_file):
-            shutil.move(source_file, target_dir)            # 이동: './data/YYYYMMDD/downdata/{file}'
-        else:
-            print('옮길 파일 없음: ', source_file)
-            return
+        shutil.move(source_file, target_dir)            # 이동: './data/YYYYMMDD/downdata/{file}'
     except Exception as e:
         with open('./error.log', 'a') as file:
             file.write(
                 f'[moving_to_folder.py - Moving Data] <{datetime.datetime.now()}> move error {target_dir}  ==> {e}\n'
             )
+        # 어떤 문제이든 에러가 발생하면 프로그램 종료
         raise(e)
 
 

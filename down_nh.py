@@ -2,7 +2,6 @@
 
 import pyautogui as gui
 import datetime, os
-import pyperclip
 import moving_to_folder as todown
 
 def down(work_date):

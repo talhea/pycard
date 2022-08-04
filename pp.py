@@ -2,40 +2,46 @@
 프로그램별로 실행한 결과를 바탕으로 실패한 프로그램 재실행
 문제점) 한번 실패한 과정은 계속 실패만 하므로, 더 이상 진행할 필요가 없음
 '''
-from operator import is_
-from sqlite3 import TimeFromTicks
+
 import schedule, time, datetime
 import edi_opera, opera_xml
 import down_opera, down_kicc, down_ibk, down_nh
 import kicc_history, kicc_receipts
 import bank_data
 import preparation
-# from pytimekr import pytimekr
+
+# 당 해년도 공휴일 검색하는 holidays.py 모듈
+import holidays
 
 # 휴일 날짜 획득
-# holidays = pytimekr.holidays(year=datetime.datetime.now().year)
-# holidays.append(datetime.datetime.now().date())
-# for day in holidays:
+holiday_list = holidays.get_dates()                 # datetime Series
+# for day in holiday_list:
 #     print(type(day), day)
 
-# # 토(5), 일(6) 주말 확인
-# is_weekend = datetime.datetime.now().weekday()
+# 당일 실행되지 못하는 날짜 버퍼
+unprocessed_dates = []                              # datetime 리스트
 
+# 토(5), 일(6) 주말 확인
+what_weekend = datetime.datetime.now().weekday()
+# print(what_weekend)
 
-# 1. 휴일이나 주말일때는 process를 진행하지 않고, 그 날짜를 리스트에 저장한다.
-#   이 값들은 호출되는 함수 내에서 strftime함수를 호출하거나, delta값 계산에 이용된다
-# delayed_date = []               # datetime 리스트
+# 휴일이나 주말일때는 처리하지않고, 그 날짜를 리스트에 저장한다.
 
-# 2. 아침에 시작할때, 위의 리스트를 체크해서 먼저 실행하고, 당일을 실행한다
-#   실행시에는, 인자로 datatime을 넘겨준다
+# 아침에 시작할때, 위의 리스트를 체크해서 먼저 실행하고, 당일을 실행한다
+# 실행시에는, 인자로 datatime을 넘겨준다
 
 # 금일 확인
-today = datetime.datetime.now()
+today = datetime.datetime.today()
 
-# if today.weekday() in [5, 6] or today.date() in holidays:       # 토, 일요일, 공유일
-#     delayed_date.append(today.date())                           # 리스트에 추가
+# if today.weekday() in [5, 6] or today.date() in holiday_list:         # 토, 일요일, 공휴일인 경우
+#     unprocessed_dates.append(today.date())                            # 그 날(datetime 형식)을 리스트에 추가
 #     # 종료 또는 블럭 벗어날 것
-#     exit()
+if today.weekday() in [5, 6]:
+    print(f'weekday: {today.weekday()} - {today}')
+
+if today.date() in holiday_list:
+    print(f'holiday: {today.date()}')
+
 # elif len(holidays) != 0:                # 이전의 작업일이 있다면 실행
 #     for holiday in holidays:            # 등록된 모든 날짜대로 looping
 #         wanted_date = holiday - datetime.timedelta(1)       # 해당 날의 작업 날짜(하루 전)
@@ -43,7 +49,7 @@ today = datetime.datetime.now()
 #         # schedule.every(3).minutes.do(job) 3분 마다 작업 실시
 
 # 출근하는 오늘 날짜 처리
-yesterday = today - datetime.timedelta(1)
+# yesterday = today - datetime.timedelta(1)
 
 # preparation.ready(yesterday)
 # schedule.every().day.at("07:00").do(preparation.ready, yesterday)

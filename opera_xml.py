@@ -18,8 +18,7 @@ def to_opera_df(work_date):
 
     # 1. xml 파일로된 오페라 trial balance를 ElementTree 객체로 읽어들임
     target_date = work_date.strftime("%Y%m%d")  # 어제 날짜 포맷
-    # 임시
-    # target_date = '20220710'
+    
     downdata_dir = f'./data/{target_date}/downdata/'                    # 읽어들일 down디렉토리 './data/YYYYMMDD/downdata/'
     xml_filename = 'trial_balance' + target_date + '.xml'               # 파일 이름 'trial_balanceYYYYMMDD.xml'
     
@@ -30,6 +29,7 @@ def to_opera_df(work_date):
             file.write(
                 f'[opera_xml.py - Rading Data] <{datetime.datetime.now()}> ElementTree file-reading error ({xml_filename}) ===> {e}\n'
             )
+        # 기능 에러가 아닌 오페라 파일이 존재하지 않는경우에도 문제가 있으므로 프로그램을 멈추어야 함
         raise(e)
 
     # 2. trial balance 내용인 node(G_TRX_CODE tag : ) 추출
@@ -71,6 +71,10 @@ def to_opera_df(work_date):
 
     # 5. 실제 필요한 dataframe 추출
     # 5-1. 오페라 신용카드 transaction code 추출 : 실행파일 opera_card_trx_code.py(ipynb)에서 생성
+    if os.path.exists('./trx_card_codes.csv') == False:                     # 해당 파일 없으면 프로그램 종료
+        print('파일 trx_card_codes.csv 없음')
+        exit()
+    
     card_df = pnds.read_csv('./trx_card_codes.csv', sep='\t')               # {'TRX_CODE': 'Description'} 형식
     card_df['TRX_CODE'] = card_df['TRX_CODE'].astype('str', errors='ignore')# trx_code를 str 타입으로 변경
 

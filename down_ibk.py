@@ -1,10 +1,8 @@
 # 기업은행 입금내역(오늘 기준)를 내여받는다
 
-import imp
-from tkinter import E
 import pyautogui as gui
 import datetime
-import os, shutil
+import os
 import moving_to_folder as todown
 from dateutil.relativedelta import relativedelta
 
@@ -61,7 +59,7 @@ def down(work_date):
     gui.click(620, 625)
     gui.press('tab')
     
-    #   현재 날짜와 work_date위 날짜 차이 : diff_dt.[years, months, days]
+    #   현재 날짜와 work_date의 날짜 차이 : diff_dt.[years, months, days]
     #   그 차이만큼 'UP'키를 눌러서 셋팅한다
     diff_dt = relativedelta(datetime.datetime.now(), work_date)
     
@@ -142,6 +140,10 @@ def down(work_date):
                                                                                             # 목적지 : './data/YYYYMMDD/downdata/거래내역조회_입출식 예금YYYYMMDD.txt'
     
     #   파일 옮기기
+    if os.path.exists(down_base_dir + source_filename) == False:                            # IBK 은행 거래내역 파일이 없을 경우에 메세지 출력하고 함수 종료
+        print('<down_ibk.py> 당일 IBK은행 거래 내역 없음: ', source_filename)
+        return
+    
     todown.to_downdata(down_base_dir + source_filename, target_dir)
 
 

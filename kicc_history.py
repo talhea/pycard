@@ -34,6 +34,7 @@ def to_card_history_df(work_date):
             file.write(
                 f'[kicc_history.py - Reading Data] <{datetime.datetime.now()}> Pandas excel-reading error ({card_filename}) ===> {e}\n'
             )
+        # 기능 에러가 아닌 KICC 신용카드 당일 한 건도 카드 결제된 내역이 없다는 내용도 문제이므로 프로그램 종료
         raise(e)
     
     # 2. 데이터 전처리

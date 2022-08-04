@@ -29,6 +29,7 @@ def merge_edi_opera(work_date):
             file.write(
                 f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> openpyxl file-reading error ({excel_filename}) ===> {e}\n'
             )
+        # 기능에러가 아닌 템플릿 파일 자체가 없는 경우에도 문제이므로 프로그램 종료
         raise(e)
 
     # 2. card code와 EDI 엑셀파일의 관련 매칭 정보
@@ -69,6 +70,7 @@ def merge_edi_opera(work_date):
             file.write(
                 f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({opera_xl_filename}) ===> {e}\n'
             )
+        # 기능에러가 아닌 trial balance 파일 자체가 없는 경우에도 문제이므로 프로그램 종료
         raise(e)
     
     # 4. trial balance 내의 각 카드별 금액을 해당되는 EDI 엑셀에 입력(mapping_code_edi 참조)
@@ -92,6 +94,7 @@ def merge_edi_opera(work_date):
             file.write(
                 f'[edi_opera.py - Reading Data] <{datetime.datetime.now()}> pickle file-reading error ({card_xl_filename}) ===> {e}\n'
             )
+        # 기능에러가 아닌 카드내역 파일 자체가 없는 경우에도 문제이므로 프로그램 종료
         raise(e)
     
     #   이전(2일 전) 거래내역 중, 이미 등록된 당일(어제) 날짜의 거래내역들을 당일 작업에 반영되지 않도록 제거
@@ -130,7 +133,7 @@ def merge_edi_opera(work_date):
     card_history_df.loc[collected_cards, 'Description'] = 'LT'
 
     #   'KEB'
-    condition = (card_history_df['매입카드사'] == '하나구외환')  & (card_history_df['발급카드사'].str.startswith('하나', na=False) | card_history_df['발급카드사'].str.startswith('토스', na=False))
+    condition = (card_history_df['매입카드사'] == '하나구외환') & (card_history_df['발급카드사'].str.startswith('하나', na=False) | card_history_df['발급카드사'].str.startswith('토스', na=False))
     collected_cards = card_history_df[condition].index.tolist()
     card_history_df.loc[collected_cards, '카드분류'] = '9243'
     card_history_df.loc[collected_cards, 'Description'] = 'KEB'

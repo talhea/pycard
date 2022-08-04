@@ -38,17 +38,17 @@ def get_dup_serials(work_date) -> list:
         raise(e)
 
     # 2. 중복처리 되는 당일 처리 날짜의 거래고유번호를 찾아서 리스트 버퍼에 저장한다
-    serial_rows = []                                # 거래고유번호 버퍼
+    serials = []                                    # 거래고유번호 버퍼
     target_day = work_date.strftime('%d')           # 당일(어제)) 날짜의 일(day): 'DD' (두자리 문자열)
     
     #   엑셀의 'A'컬럼에서 각 값의 시작 글자를 확인해서 거래고유번호 추출
     for serial_num_string in ws['A']:               # 'A'컬럼('거래고유번호')  looping
         if serial_num_string.value != None:         # None 값으로 인해서 error 발생하는 경우 있음
             if serial_num_string.value.startswith(target_day) == True:          # 작업일 하루 전(2일 전) 거래내역에서의 '거래고유번호'의 시작이 작업일(어제) 날짜의 일(day)로 시작하는 경우
-                serial_rows.append(serial_num_string.value)                     # 해당 거래는 현(당일) 작업 날짜와 중복되는 내용이므로, 이 떄의 '거래고유번호'를 리스트에 저장
+                serials.append(serial_num_string.value)                         # 해당 거래는 현(당일) 작업 날짜와 중복되는 내용이므로, 이 떄의 '거래고유번호'를 리스트에 저장
     
     # 3. 중복 거래고유번호 리스트 반환
-    return serial_rows                              # 리스트 반환
+    return serials
 
 
 if __name__ == '__main__':

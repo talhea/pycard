@@ -2,7 +2,6 @@
 다운로드 받은 KICC 입금 현황을 dataframe으로 저장한다
 """  
 
-from statistics import mode
 import pandas as pnds
 import pickle, os
 import datetime
@@ -33,6 +32,7 @@ def to_receipts_history_df(work_date):
             file.write(
                 f'[kicc_receipts - Reading Data] <{datetime.datetime.now()}> Pandas excel-reading error ({receipts_filename}) ===> {e}\n'
             )
+        # 기능 에러가 아닌 빈 거래내역 파일 조차도 없는 경우도 문제이므로 프로그램 종료
         raise(e)
 
     # 2. '입금예정일자' 컬럼명 'date'로 수정 : 다른 dataframe과 통일
